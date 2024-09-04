@@ -1,9 +1,13 @@
 import Item from '#models/item'
 import ItemTransaction from '#models/item_transaction'
+import ItemUnit from '#models/item_unit'
 import { createItemValidator, changeItemQuantityValidator } from '#validators/item'
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import { InventoryValueResponse } from './dto/inventory_value.response.js'
+import ItemCategory from '#models/item_category'
+import { InventoryQuantityResponse } from './dto/inventory_quantity.response.js'
 
 @inject()
 export default class ItemsController {
@@ -14,12 +18,11 @@ export default class ItemsController {
    */
   async createItem({ request, auth }: HttpContext) {
     if (!auth.user) throw new Error('Unauthorized')
-    const userClinic = auth.user.clinic
     const payload = await request.validateUsing(createItemValidator)
     return Item.create({
       name: payload.name,
       quantity: payload.quantity,
-      clinicId: userClinic.id,
+      itemCategoryId: payload.itemCategoryId,
     })
   }
 
@@ -103,5 +106,36 @@ export default class ItemsController {
     const page = request.qs().page ? Number(request.qs().page) : 1
     const limit = request.qs().limit ? Number(request.qs().limit) : 10
     return Item.itemsNeedingReplacement(userClinic.id, { page, limit })
+  }
+
+  /**
+   * @inventoryValue
+   *
+   * @responseBody 200 - {"inventoryValue": number}
+   */
+  async inventoryValue({ auth }: HttpContext): Promise<InventoryValueResponse> {
+    const userClinic = auth.user!.clinic
+    const inventoryValue = await ItemUnit.calculateInventoryValue(userClinic.id)
+    return {
+      inventoryValue,
+    }
+  }
+
+  /**
+   * @inventoryQuantity
+   *
+   * @responseBody 200 - {"itemsQuantity": number, "categoriesQuantity": number}
+   */
+
+  async inventoryQuantity({ auth }: HttpContext): Promise<InventoryQuantityResponse> {
+    const userClinic = auth.user!.clinic
+    const [itemsQuantity, categoriesQuantity] = await Promise.all([
+      ItemUnit.availableUnits(userClinic.id),
+      ItemUnit.availableCategories(userClinic.id),
+    ])
+    return {
+      itemsQuantity,
+      categoriesQuantity,
+    }
   }
 }

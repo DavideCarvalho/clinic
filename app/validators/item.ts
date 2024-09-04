@@ -2,8 +2,9 @@ import vine from '@vinejs/vine'
 
 export const createItemValidator = vine.compile(
   vine.object({
-    name: vine.string().minLength(1),
+    name: vine.string().minLength(1).trim(),
     quantity: vine.number().min(0),
+    itemCategoryId: vine.string().uuid().trim(),
   })
 )
 

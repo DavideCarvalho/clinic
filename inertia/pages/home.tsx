@@ -10,14 +10,30 @@ import {
 import { Progress } from '~/lib/components/ui/progress'
 import { AlertTriangle, DollarSign, Package } from 'lucide-react'
 import { ClinicLayout } from '~/layouts/clinic_layout'
-import { getItemsNeedingReplacement } from '~/api/inventory.api'
+import {
+  getInventoryQuantity,
+  getInventoryValue,
+  getItemsNeedingReplacement,
+} from '~/api/inventory.api'
 import { useQuery } from '@tanstack/react-query'
+import { formatCurrency } from '~/lib/format-currency'
 
 export default function HomePage() {
   const { data: itemsNeedingReplacement } = useQuery({
     queryKey: ['inventory', 'itemsNeedingReplacement'],
     queryFn: () => getItemsNeedingReplacement(),
   })
+  const { data: inventoryValue } = useQuery({
+    queryKey: ['inventory', 'inventory-value'],
+    queryFn: () => getInventoryValue(),
+  })
+
+  const { data: inventoryQuantity } = useQuery({
+    queryKey: ['inventory', 'inventory-quantity'],
+    queryFn: () => getInventoryQuantity(),
+  })
+
+  const value = inventoryValue ? inventoryValue?.inventoryValue / 100 : 0
   return (
     <>
       <div className="mb-6">
@@ -29,8 +45,10 @@ export default function HomePage() {
               <Package className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1,543</div>
-              <p className="text-xs text-muted-foreground">Em 5 categorias diferentes</p>
+              <div className="text-2xl font-bold">{inventoryQuantity?.itemsQuantity}</div>
+              <p className="text-xs text-muted-foreground">
+                {inventoryQuantity?.categoriesQuantity} categorias diferentes
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -49,7 +67,7 @@ export default function HomePage() {
               <DollarSign className="h-4 w-4 text-green-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">R$ 287.650</div>
+              <div className="text-2xl font-bold">{formatCurrency(value)}</div>
               <p className="text-xs text-muted-foreground">Atualizado diariamente</p>
             </CardContent>
           </Card>

@@ -16,6 +16,7 @@ import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
 import ItemsService from '#services/items.service'
 import Item from '#models/item'
+import ItemUnit from '#models/item_unit'
 
 // API routes
 router
@@ -47,6 +48,8 @@ router
           '/items-needing-replacement',
           '#controllers/inventory_controller.itemsNeedingReplacement'
         )
+        router.get('/inventory-value', '#controllers/inventory_controller.inventoryValue')
+        router.get('/inventory-quantity', '#controllers/inventory_controller.inventoryQuantity')
       })
       .prefix('/v1/inventory')
       .use(middleware.auth())
@@ -93,6 +96,28 @@ router
       queryClient.prefetchQuery({
         queryKey: ['inventory', 'itemsNeedingReplacement'],
         queryFn: () => Item.itemsNeedingReplacement(user.clinicId, { page, limit }),
+      }),
+      queryClient.prefetchQuery({
+        queryKey: ['inventory', 'inventory-value'],
+        queryFn: async () => {
+          const inventoryValue = await ItemUnit.calculateInventoryValue(user.clinicId)
+          return {
+            inventoryValue,
+          }
+        },
+      }),
+      queryClient.prefetchQuery({
+        queryKey: ['inventory', 'inventory-quantity'],
+        queryFn: async () => {
+          const [itemsQuantity, categoriesQuantity] = await Promise.all([
+            ItemUnit.availableUnits(user.clinicId),
+            ItemUnit.availableCategories(user.clinicId),
+          ])
+          return {
+            itemsQuantity,
+            categoriesQuantity,
+          }
+        },
       }),
     ])
     return ctx.inertia.render('home', {

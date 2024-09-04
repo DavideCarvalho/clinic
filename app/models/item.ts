@@ -23,21 +23,21 @@ export default class Item extends BaseUUIDModel {
     clinicId: string,
     { page = 1, limit = 10 }: { page?: number; limit?: number }
   ) {
-    const data = await Item.query()
+    const data = await this.query()
       .join(
         ItemCategory.table,
         `${ItemCategory.table}.${ItemCategory.$getColumn('id')!.columnName}`,
         '=',
-        Item.$getColumn('itemCategoryId')!.columnName
+        this.$getColumn('itemCategoryId')!.columnName
       )
       .where(`${ItemCategory.table}.${ItemCategory.$getColumn('clinicId')!.columnName}`, clinicId)
       .whereRaw('?? < ??', [
-        Item.$getColumn('quantity')!.columnName,
-        Item.$getColumn('minimumQuantity')!.columnName,
+        this.$getColumn('quantity')!.columnName,
+        this.$getColumn('minimumQuantity')!.columnName,
       ])
       .orderByRaw('(??  / ??)', [
-        Item.$getColumn('quantity')!.columnName,
-        Item.$getColumn('minimumQuantity')!.columnName,
+        this.$getColumn('quantity')!.columnName,
+        this.$getColumn('minimumQuantity')!.columnName,
       ])
       .preload('itemCategory')
       .paginate(page, limit)
