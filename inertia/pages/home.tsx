@@ -17,6 +17,7 @@ import {
 } from '~/api/inventory.api'
 import { useQuery } from '@tanstack/react-query'
 import { formatCurrency } from '~/lib/format-currency'
+import { Head } from '@inertiajs/react'
 
 export default function HomePage() {
   const { data: itemsNeedingReplacement } = useQuery({
@@ -36,6 +37,10 @@ export default function HomePage() {
   const value = inventoryValue ? inventoryValue?.inventoryValue / 100 : 0
   return (
     <>
+      <Head>
+        <title>Clinicare - Dashboard</title>
+        <meta name="description" content="Clinicare - Dashboard" />
+      </Head>
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-purple-600 mb-4">Visão Geral do Inventário</h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

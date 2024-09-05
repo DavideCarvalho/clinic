@@ -14,7 +14,6 @@ import app from '@adonisjs/core/services/app'
 import ContractsService from '#services/contracts.service'
 import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
-import ItemsService from '#services/items.service'
 import Item from '#models/item'
 import ItemUnit from '#models/item_unit'
 
@@ -50,6 +49,7 @@ router
         )
         router.get('/inventory-value', '#controllers/inventory_controller.inventoryValue')
         router.get('/inventory-quantity', '#controllers/inventory_controller.inventoryQuantity')
+        router.get('/clinic/items', '#controllers/inventory_controller.getClinicItems')
       })
       .prefix('/v1/inventory')
       .use(middleware.auth())
@@ -70,7 +70,6 @@ router
     const page = queryString.page ?? 1
     const limit = queryString.limit ?? 10
     const contractsService = await app.container.make(ContractsService)
-    const itemsService = await app.container.make(ItemsService)
     const queryClient = getQueryClient()
     await Promise.all([
       queryClient.prefetchQuery({
@@ -127,6 +126,8 @@ router
   .use(middleware.auth())
 router.on('/login').renderInertia('login').use(middleware.guest())
 router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha')
+router.on('/inventario/novo-item').renderInertia('inventario/novo-item')
+router.on('/inventario/itens').renderInertia('inventario/itens')
 
 router.get('/swagger', async () => {
   return AutoSwagger.default.docs(router.toJSON(), swagger)

@@ -1,4 +1,5 @@
-import { ContactIcon, Link } from 'lucide-react'
+import { Link } from '@inertiajs/react'
+import { ContactIcon } from 'lucide-react'
 
 export function ClinicLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -3,7 +3,7 @@ import Item from '#models/item'
 import { InventoryValueResponse } from '#controllers/dto/inventory_value.response'
 import { Pageable } from './utils/pageable.dto'
 
-type DeepNonFunctionAndNonDollarProperties<T> = {
+export type DeepNonFunctionAndNonDollarProperties<T> = {
   [K in keyof T as K extends `$${string}`
     ? never
     : T[K] extends Function
@@ -12,7 +12,7 @@ type DeepNonFunctionAndNonDollarProperties<T> = {
 }
 
 export function getItemsNeedingReplacement(): Promise<
-  Pageable<DeepNonFunctionAndNonDollarProperties<Item>>
+  Pageable<DeepNonFunctionAndNonDollarProperties<Item[]>>
 > {
   return fetch('/api/v1/inventory/items-needing-replacement').then((res) => {
     if (!res.ok) throw new Error(res.statusText)
@@ -29,6 +29,13 @@ export function getInventoryValue(): Promise<InventoryValueResponse> {
 
 export function getInventoryQuantity(): Promise<InventoryQuantityResponse> {
   return fetch('/api/v1/inventory/inventory-quantity').then((res) => {
+    if (!res.ok) throw new Error(res.statusText)
+    return res.json()
+  })
+}
+
+export function getClinicItems(): Promise<DeepNonFunctionAndNonDollarProperties<Item>[]> {
+  return fetch('/api/v1/inventory/clinic/items').then((res) => {
     if (!res.ok) throw new Error(res.statusText)
     return res.json()
   })

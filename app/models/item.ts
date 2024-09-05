@@ -19,6 +19,17 @@ export default class Item extends BaseUUIDModel {
   @belongsTo(() => ItemCategory)
   declare itemCategory: BelongsTo<typeof ItemCategory>
 
+  public static async getClinicItems(clinicId: string): Promise<Item[]> {
+    return this.query()
+      .join(
+        ItemCategory.table,
+        `${ItemCategory.table}.${ItemCategory.$getColumn('id')!.columnName}`,
+        '=',
+        `${this.table}.${this.$getColumn('itemCategoryId')!.columnName}`
+      )
+      .where(`${ItemCategory.table}.${ItemCategory.$getColumn('clinicId')!.columnName}`, clinicId)
+  }
+
   public static async itemsNeedingReplacement(
     clinicId: string,
     { page = 1, limit = 10 }: { page?: number; limit?: number }

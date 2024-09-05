@@ -6,7 +6,6 @@ import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { InventoryValueResponse } from './dto/inventory_value.response.js'
-import ItemCategory from '#models/item_category'
 import { InventoryQuantityResponse } from './dto/inventory_quantity.response.js'
 
 @inject()
@@ -137,5 +136,15 @@ export default class ItemsController {
       itemsQuantity,
       categoriesQuantity,
     }
+  }
+
+  /**
+   * @getClinicItems
+   *
+   * @responseBody 200 - [{"id": number, "name": string, "quantity": number, "clinicId": string, "minimumQuantity": number, "itemCategoryId": string, "createdById": number, "updatedById": number, "createdAt": string, "updatedAt": string}]
+   */
+  async getClinicItems({ auth }: HttpContext) {
+    const userClinic = auth.user!.clinic
+    return Item.getClinicItems(userClinic.id)
   }
 }
