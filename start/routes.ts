@@ -124,10 +124,10 @@ router
     })
   })
   .use(middleware.auth())
+router.on('/inventario/novo-item').renderInertia('inventario/novo-item').use(middleware.auth())
+router.on('/inventario').renderInertia('inventario/itens').use(middleware.auth())
 router.on('/login').renderInertia('login').use(middleware.guest())
-router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha')
-router.on('/inventario/novo-item').renderInertia('inventario/novo-item')
-router.on('/inventario/itens').renderInertia('inventario/itens')
+router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha').use(middleware.guest())
 
 router.get('/swagger', async () => {
   return AutoSwagger.default.docs(router.toJSON(), swagger)
