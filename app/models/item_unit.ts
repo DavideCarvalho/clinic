@@ -12,6 +12,9 @@ export default class ItemUnit extends BaseUUIDModel {
   @column()
   declare status: string
 
+  @column()
+  declare itemBatchId: string
+
   @belongsTo(() => ItemBatch)
   declare itemBatch: BelongsTo<typeof ItemBatch>
 

@@ -186,7 +186,10 @@ export default function ItemsPage() {
               <TableCell className="font-medium">{item.name}</TableCell>
               <TableCell>{item.quantity}</TableCell>
               <TableCell>
-                {/* {item.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} */}
+                {(item.inventoryValue / 100).toLocaleString('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
+                })}
               </TableCell>
               <TableCell>{item.name}</TableCell>
             </TableRow>
