@@ -7,22 +7,37 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { getQueryClient } from '~/lib/query_client'
 import { ClinicLayout } from '~/layouts/clinic_layout'
+import { Link } from '@inertiajs/react'
+import { ArrowLeft } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { getClinicItemCategories } from '~/api/inventory.api'
+import { SelectWithSearch } from '~/lib/common/select-with-search'
 
 const schema = z.object({
   nome: z.string().min(1),
-  quantidade: z.number().min(0),
-  valorUnitario: z.number().min(0).step(0.01),
+  categoryId: z.string().uuid(),
 })
 
 export default function NewItemPage() {
   const queryClient = getQueryClient()
+  const { data: categories } = useQuery({
+    queryKey: ['inventory', 'item-categories'],
+    queryFn: () => getClinicItemCategories(),
+  })
   const form = useForm<z.infer<typeof schema>>({
     defaultValues: {
       nome: '',
-      quantidade: 0,
-      valorUnitario: 1,
+      categoryId: '',
     },
   })
+
+  const options =
+    categories?.map((category) => ({
+      value: category.id,
+      label: category.name,
+    })) ?? []
+
+  const categoryId = form.watch('categoryId')
 
   function handleSubmit(data: z.infer<typeof schema>) {
     // Aqui você pode adicionar a lógica para enviar os dados para o backend
@@ -33,7 +48,15 @@ export default function NewItemPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col items-center justify-center content-center">
+    <div className="flex w-full min-h-full flex-col items-center justify-center content-center">
+      <div className="flex w-full justify-start">
+        <Button>
+          <Link href="/inventario" className="text-sm">
+            <ArrowLeft className="ml-2 h-4 w-4" />
+            Voltar
+          </Link>
+        </Button>
+      </div>
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
@@ -48,22 +71,11 @@ export default function NewItemPage() {
                 <Input {...form.register('nome')} placeholder="Digite o nome do item" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="quantidade">Quantidade</Label>
-                <Input
-                  {...form.register('nome')}
-                  type="number"
-                  min="0"
-                  placeholder="Digite a quantidade"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="preco">Valor unitário</Label>
-                <Input
-                  {...form.register('nome')}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Digite o valor unitário"
+                <SelectWithSearch
+                  value={categoryId}
+                  onChange={(value) => form.setValue('categoryId', value)}
+                  placeholder="Selecione uma categoria"
+                  options={options}
                 />
               </div>
               <Button type="submit" className="w-full">

@@ -5,6 +5,8 @@ import ItemCategory from './item_category.js'
 import db from '@adonisjs/lucid/services/db'
 import ItemUnit from './item_unit.js'
 import ItemBatch from './item_batch.js'
+import { RawQueryResponse } from './utils/raw-query-response.js'
+import ItemTransaction from './item_transaction.js'
 
 export default class Item extends BaseUUIDModel {
   @column()
@@ -127,5 +129,97 @@ export default class Item extends BaseUUIDModel {
       .preload('itemCategory')
       .paginate(page, limit)
     return data.toJSON()
+  }
+
+  public static async itemsWithMostTransactionsWithinLast12Months(
+    clinicId: string,
+    { page = 1, limit = 10 }: { page?: number; limit?: number }
+  ): Promise<
+    {
+      id: string
+      name: string
+      quantity: number
+      clinicId: string
+      minimumQuantity: number
+      itemCategoryId: string
+      createdById: string
+      updatedById: string
+      createdAt: Date
+      updatedAt: Date
+      total: number
+      ammountOut: number
+    }[]
+  > {
+    const [response] = await db.rawQuery<
+      RawQueryResponse<{
+        id: string
+        name: string
+        quantity: number
+        clinic_id: string
+        minimum_quantity: number
+        item_category_id: string
+        created_by_id: string
+        updated_by_id: string
+        created_at: Date
+        updated_at: Date
+        total: number
+        ammount_out: number | null
+      }>
+    >(
+      `
+        SELECT
+          ${this.table}.*,
+          COUNT(${ItemUnit.table}.${this.$getColumn('id')!.columnName}) AS total,
+          (
+            SELECT
+              SUM(${ItemTransaction.table}.${ItemTransaction.$getColumn('amount')!.columnName}) AS amount
+            FROM
+              ${ItemTransaction.table}
+            WHERE
+              ${ItemTransaction.table}.${ItemTransaction.$getColumn('itemId')!.columnName} = ${this.table}.${this.$getColumn('id')!.columnName}
+            AND
+              ${ItemTransaction.table}.${ItemTransaction.$getColumn('createdAt')!.columnName} >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            AND
+              ${ItemTransaction.table}.${ItemTransaction.$getColumn('type')!.columnName} = 'OUT'
+          ) as ammount_out
+        FROM
+          ${this.table}
+        INNER JOIN
+          ${ItemBatch.table} ON ${ItemBatch.table}.${ItemBatch.$getColumn('itemId')!.columnName} = ${this.table}.${this.$getColumn('id')!.columnName}
+        INNER JOIN
+          ${ItemUnit.table} ON ${ItemUnit.table}.${ItemUnit.$getColumn('itemBatchId')!.columnName} = ${ItemBatch.table}.${ItemBatch.$getColumn('id')!.columnName}
+        INNER JOIN
+          ${ItemCategory.table} ON ${ItemCategory.table}.${ItemCategory.$getColumn('id')!.columnName} = ${Item.table}.${Item.$getColumn('itemCategoryId')!.columnName}
+        WHERE
+          ${ItemCategory.table}.${ItemCategory.$getColumn('clinicId')!.columnName} = ?
+        AND
+          MONTH(${ItemUnit.table}.${ItemUnit.$getColumn('createdAt')!.columnName}) >= MONTH(DATE_SUB(NOW(), INTERVAL 12 MONTH))
+        AND
+          YEAR(${ItemUnit.table}.${ItemUnit.$getColumn('createdAt')!.columnName}) >= YEAR(DATE_SUB(NOW(), INTERVAL 12 MONTH))
+        GROUP BY
+          ${this.table}.${this.$getColumn('id')!.columnName}
+        ORDER BY
+          total DESC
+        LIMIT
+          ?
+        OFFSET
+          ?
+      `,
+      [clinicId, limit, limit * (page - 1)]
+    )
+    return response.map((item) => ({
+      id: item.id,
+      name: item.name,
+      quantity: item.quantity,
+      clinicId: item.clinic_id,
+      minimumQuantity: item.minimum_quantity,
+      itemCategoryId: item.item_category_id,
+      createdById: item.created_by_id,
+      updatedById: item.updated_by_id,
+      createdAt: item.created_at,
+      updatedAt: item.updated_at,
+      total: item.total,
+      ammountOut: Number(item.ammount_out) ?? 0,
+    }))
   }
 }

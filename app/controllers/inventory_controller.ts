@@ -7,6 +7,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import { InventoryValueResponse } from './dto/inventory_value.response.js'
 import { InventoryQuantityResponse } from './dto/inventory_quantity.response.js'
+import { GetItemsWithMostTransactionsWithinLast12MonthsResponse } from './dto/get_items_with_most_transactions_within_last_12_months.response.js'
+import ItemCategory from '#models/item_category'
 
 @inject()
 export default class ItemsController {
@@ -146,5 +148,30 @@ export default class ItemsController {
   async getClinicItems({ auth }: HttpContext) {
     const userClinic = auth.user!.clinic
     return Item.getClinicItems(userClinic.id)
+  }
+
+  /**
+   * @getItemsWithMostTransactionsWithinLast12Months
+   *
+   * @responseBody 200 - [{"id": number, "itemId": number, "type": string, "amount": number, "createdById": number, "updatedById": number, "createdAt": string, "updatedAt": string, "itemCategoryName": string}]
+   */
+  async getItemsWithMostTransactionsWithinLast12Months({
+    request,
+    auth,
+  }: HttpContext): Promise<GetItemsWithMostTransactionsWithinLast12MonthsResponse> {
+    const userClinic = auth.user!.clinic
+    const page = request.qs().page ? Number(request.qs().page) : 1
+    const limit = request.qs().limit ? Number(request.qs().limit) : 10
+    return Item.itemsWithMostTransactionsWithinLast12Months(userClinic.id, {
+      page,
+      limit,
+    })
+  }
+
+  async getCategories({ auth }: HttpContext) {
+    const userClinic = auth.user!.clinic
+    return ItemCategory.findManyBy({
+      clinicId: userClinic.id,
+    })
   }
 }

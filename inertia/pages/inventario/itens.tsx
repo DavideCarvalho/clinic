@@ -10,6 +10,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ClinicLayout } from '~/layouts/clinic_layout'
+import { Plus as PlusIcon } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -18,62 +19,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
-import { DeepNonFunctionAndNonDollarProperties, getClinicItems } from '~/api/inventory.api'
-import Item from '#models/item'
+import { getClinicItems, GetClinicItemsResponse } from '~/api/inventory.api'
 import { useQuery } from '@tanstack/react-query'
-
-type InventoryItem = {
-  id: number
-  nome: string
-  quantidade: number
-  preco: number
-  descricao: string
-}
-
-const inventoryData: InventoryItem[] = [
-  { id: 1, nome: 'Laptop', quantidade: 50, preco: 999.99, descricao: 'Laptop de alta performance' },
-  { id: 2, nome: 'Mouse', quantidade: 100, preco: 29.99, descricao: 'Mouse ergonômico' },
-  { id: 3, nome: 'Teclado', quantidade: 75, preco: 59.99, descricao: 'Teclado mecânico' },
-  {
-    id: 4,
-    nome: 'Monitor',
-    quantidade: 30,
-    preco: 299.99,
-    descricao: 'Monitor 4K de 27 polegadas',
-  },
-  {
-    id: 5,
-    nome: 'Headset',
-    quantidade: 60,
-    preco: 89.99,
-    descricao: 'Headset com cancelamento de ruído',
-  },
-  { id: 6, nome: 'Webcam', quantidade: 40, preco: 79.99, descricao: 'Webcam Full HD' },
-  {
-    id: 7,
-    nome: 'Impressora',
-    quantidade: 25,
-    preco: 199.99,
-    descricao: 'Impressora multifuncional',
-  },
-  {
-    id: 8,
-    nome: 'Roteador',
-    quantidade: 35,
-    preco: 69.99,
-    descricao: 'Roteador Wi-Fi de alta velocidade',
-  },
-  { id: 9, nome: 'HD Externo', quantidade: 55, preco: 119.99, descricao: 'HD Externo 2TB' },
-  { id: 10, nome: 'Pen Drive', quantidade: 150, preco: 19.99, descricao: 'Pen Drive 64GB' },
-  {
-    id: 11,
-    nome: 'Carregador',
-    quantidade: 80,
-    preco: 39.99,
-    descricao: 'Carregador USB-C rápido',
-  },
-  { id: 12, nome: 'Cabo HDMI', quantidade: 70, preco: 14.99, descricao: 'Cabo HDMI 2m' },
-]
+import { Link } from '@inertiajs/react'
 
 export default function ItemsPage() {
   const { data: items, status: itemsStatus } = useQuery({
@@ -82,15 +30,14 @@ export default function ItemsPage() {
   })
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
-  const [data, setData] = useState<DeepNonFunctionAndNonDollarProperties<Item>[]>([])
+  const [data, setData] = useState<GetClinicItemsResponse>([])
   const [sortConfig, setSortConfig] = useState<{
-    key: keyof DeepNonFunctionAndNonDollarProperties<Item>
+    key: keyof GetClinicItemsResponse[0]
     direction: 'asc' | 'desc'
   } | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
-  // Função para ordenar os itens
-  const sortItems = (key: keyof DeepNonFunctionAndNonDollarProperties<Item>) => {
+  const sortItems = (key: keyof GetClinicItemsResponse[0]) => {
     let direction: 'asc' | 'desc' = 'asc'
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc'
@@ -135,6 +82,14 @@ export default function ItemsPage() {
 
   return (
     <div className="container mx-auto py-10">
+      <div className="flex justify-end">
+        <Button variant="default" className="bg-purple-600 hover:bg-purple-700 text-white">
+          <Link href="/inventario/novo-item" className="text-sm">
+            + Adicionar Item
+          </Link>
+        </Button>
+      </div>
+
       <div className="flex justify-between items-center mb-4">
         <Input
           placeholder="Pesquisar itens..."

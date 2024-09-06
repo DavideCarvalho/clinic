@@ -1,7 +1,6 @@
 import type { DateTime } from 'luxon'
 import { belongsTo, column } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
-import User from './user.js'
 import Item from './item.js'
 import BaseUUIDModel from './utils/base_uuid_model.js'
 
@@ -9,7 +8,7 @@ export default class ItemTransaction extends BaseUUIDModel {
   @column()
   declare itemId: string
 
-  // INCREASE | DECREASE
+  // IN | OUT
   @column()
   declare type: string
 

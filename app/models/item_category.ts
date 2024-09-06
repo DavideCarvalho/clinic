@@ -3,6 +3,7 @@ import type { HasMany } from '@adonisjs/lucid/types/relations'
 import BaseUUIDModel from './utils/base_uuid_model.js'
 import Item from '#models/item'
 import db from '@adonisjs/lucid/services/db'
+import { RawQueryResponse } from './utils/raw-query-response.js'
 
 export default class ItemCategory extends BaseUUIDModel {
   @column()
@@ -18,7 +19,7 @@ export default class ItemCategory extends BaseUUIDModel {
   declare items: HasMany<typeof Item>
 
   public static async categoriesQuantity(clinicId: string): Promise<number> {
-    const [response]: [[{ total: string }]] = await db.rawQuery(
+    const [response] = await db.rawQuery<RawQueryResponse<{ total: string }>>(
       `
       SELECT
         COUNT(*) as total

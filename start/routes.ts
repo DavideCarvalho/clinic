@@ -16,6 +16,7 @@ import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
 import Item from '#models/item'
 import ItemUnit from '#models/item_unit'
+import ItemCategory from '#models/item_category'
 
 // API routes
 router
@@ -39,17 +40,28 @@ router
 
     router
       .group(() => {
-        router.post('/', '#controllers/inventory_controller.createItem')
-        router.post('/:id/add', '#controllers/inventory_controller.increaseItemQuantity')
-        router.post('/:id/withdraw', '#controllers/inventory_controller.decreaseItemQuantity')
-        router.post('/more-utilized', '#controllers/inventory_controller.moreUtilizedItems')
+        router.post('/clinic/', '#controllers/inventory_controller.createItem')
+        router.post('/clinic/:id/add', '#controllers/inventory_controller.increaseItemQuantity')
+        router.post(
+          '/clinic/:id/withdraw',
+          '#controllers/inventory_controller.decreaseItemQuantity'
+        )
+        router.post('/clinic/more-utilized', '#controllers/inventory_controller.moreUtilizedItems')
         router.get(
           '/items-needing-replacement',
           '#controllers/inventory_controller.itemsNeedingReplacement'
         )
-        router.get('/inventory-value', '#controllers/inventory_controller.inventoryValue')
-        router.get('/inventory-quantity', '#controllers/inventory_controller.inventoryQuantity')
+        router.get('/clinic/inventory-value', '#controllers/inventory_controller.inventoryValue')
+        router.get(
+          '/clinic/inventory-quantity',
+          '#controllers/inventory_controller.inventoryQuantity'
+        )
         router.get('/clinic/items', '#controllers/inventory_controller.getClinicItems')
+        router.get(
+          '/clinic/items/most-used',
+          '#controllers/inventory_controller.getItemsWithMostTransactionsWithinLast12Months'
+        )
+        router.get('/clinic/items/categories', '#controllers/inventory_controller.getCategories')
       })
       .prefix('/v1/inventory')
       .use(middleware.auth())
@@ -124,7 +136,35 @@ router
     })
   })
   .use(middleware.auth())
-router.on('/inventario/novo-item').renderInertia('inventario/novo-item').use(middleware.auth())
+router
+  .on('/inventario/novo-item')
+  .setHandler(async (ctx) => {
+    const user = await ctx.auth.user
+    const queryClient = getQueryClient()
+    const page = ctx.request.qs().page ? Number(ctx.request.qs().page) : 1
+    const limit = ctx.request.qs().limit ? Number(ctx.request.qs().limit) : 10
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: ['inventory', 'items'],
+        queryFn: async () =>
+          Item.itemsWithMostTransactionsWithinLast12Months(user!.clinicId, {
+            page,
+            limit,
+          }),
+      }),
+      queryClient.prefetchQuery({
+        queryKey: ['inventory', 'item-categories'],
+        queryFn: async () =>
+          ItemCategory.findManyBy({
+            clinicId: user!.clinicId,
+          }),
+      }),
+    ])
+    return ctx.inertia.render('inventario/novo_item', {
+      ...returnDehydratedState(queryClient),
+    })
+  })
+  .use(middleware.auth())
 router.on('/inventario').renderInertia('inventario/itens').use(middleware.auth())
 router.on('/login').renderInertia('login').use(middleware.guest())
 router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha').use(middleware.guest())

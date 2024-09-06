@@ -13,6 +13,9 @@ export function ClinicLayout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="hover:underline">
             Dashboard
           </Link>
+          <Link href="/inventario" className="hover:underline">
+            Inventário
+          </Link>
         </nav>
       </header>
       <main className="flex-1 p-6 gap-6">{children}</main>
