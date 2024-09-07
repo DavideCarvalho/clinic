@@ -67,9 +67,9 @@ export default class Item extends BaseUUIDModel {
         ${this.table}
       INNER JOIN
         ${ItemCategory.table} ON ${ItemCategory.table}.${ItemCategory.$getColumn('id')!.columnName} = ${this.table}.${this.$getColumn('itemCategoryId')!.columnName}
-      INNER JOIN
+      LEFT JOIN
         ${ItemBatch.table} ON ${ItemBatch.table}.${ItemBatch.$getColumn('itemId')!.columnName} = ${this.table}.${this.$getColumn('id')!.columnName}
-      INNER JOIN
+      LEFT JOIN
         ${ItemUnit.table} ON ${ItemUnit.table}.${ItemUnit.$getColumn('itemBatchId')!.columnName} = ${ItemBatch.table}.${ItemBatch.$getColumn('id')!.columnName}
       WHERE
         ${ItemCategory.table}.${ItemCategory.$getColumn('clinicId')!.columnName} = ?
@@ -81,6 +81,7 @@ export default class Item extends BaseUUIDModel {
     `,
       [clinicId]
     )
+    console.log('response', response)
     return response.map((item) => ({
       id: item.id,
       name: item.name,
@@ -95,15 +96,6 @@ export default class Item extends BaseUUIDModel {
       itemCategoryName: item.item_category_name,
       inventoryValue: item.inventory_value,
     }))
-    // return this.query()
-    //   .select()
-    //   .join(
-    //     ItemCategory.table,
-    //     `${ItemCategory.table}.${ItemCategory.$getColumn('id')!.columnName}`,
-    //     '=',
-    //     `${this.table}.${this.$getColumn('itemCategoryId')!.columnName}`
-    //   )
-    //   .where(`${ItemCategory.table}.${ItemCategory.$getColumn('clinicId')!.columnName}`, clinicId)
   }
 
   public static async itemsNeedingReplacement(

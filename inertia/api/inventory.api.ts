@@ -40,7 +40,7 @@ export type GetClinicItemsResponse = DeepNonFunctionAndNonDollarProperties<
 >[]
 
 export function getClinicItems(): Promise<GetClinicItemsResponse> {
-  return fetch('/api/v1/clinic/inventory/items').then((res) => {
+  return fetch('/api/v1/inventory/clinic/items').then((res) => {
     if (!res.ok) throw new Error(res.statusText)
     return res.json()
   })

@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { getQueryClient } from '~/lib/query_client'
 import { ClinicLayout } from '~/layouts/clinic_layout'
-import { Link } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import { ArrowLeft } from 'lucide-react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createItem, getClinicItemCategories } from '~/api/inventory.api'
@@ -39,6 +39,7 @@ export default function NewItemPage() {
         })
         toast.dismiss(toastId)
         toast.success('Item criado com sucesso!')
+        router.visit('/inventario')
       } catch (e) {
         toast.dismiss(toastId)
         toast.error('Erro ao criar o item!')
@@ -98,11 +99,11 @@ export default function NewItemPage() {
                 <Input {...form.register('name')} placeholder="Digite o nome do item" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="nome">Nome do Item</Label>
+                <Label htmlFor="nome">Quantidade mínima</Label>
                 <Input
                   {...form.register('minimumQuantity')}
                   type="number"
-                  placeholder="Digite a quantidade"
+                  placeholder="Digite a quantidade mínima"
                 />
               </div>
               <div className="space-y-2">
