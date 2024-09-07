@@ -39,8 +39,6 @@ export default class Item extends BaseUUIDModel {
       itemCategoryName: string
     }[]
   > {
-    // TODO: Contar apenas os itens que estão disponíveis
-    // TODO: No ItemUnit
     const [response]: [
       {
         id: string
