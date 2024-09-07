@@ -9,13 +9,16 @@ import { getQueryClient } from '~/lib/query_client'
 import { ClinicLayout } from '~/layouts/clinic_layout'
 import { Link } from '@inertiajs/react'
 import { ArrowLeft } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
-import { getClinicItemCategories } from '~/api/inventory.api'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { createItem, getClinicItemCategories } from '~/api/inventory.api'
 import { SelectWithSearch } from '~/lib/common/select-with-search'
+import { toast } from 'sonner'
+import { LoaderIcon } from 'lucide-react'
 
 const schema = z.object({
-  nome: z.string().min(1),
-  categoryId: z.string().uuid(),
+  name: z.string().min(1),
+  minimumQuantity: z.number().min(0),
+  itemCategoryId: z.string().uuid(),
 })
 
 export default function NewItemPage() {
@@ -24,10 +27,29 @@ export default function NewItemPage() {
     queryKey: ['inventory', 'item-categories'],
     queryFn: () => getClinicItemCategories(),
   })
+
+  const saveNewItemMutation = useMutation({
+    mutationFn: async ({ name, minimumQuantity, itemCategoryId }: z.infer<typeof schema>) => {
+      const toastId = toast.loading('Criando item...')
+      try {
+        await createItem({
+          name,
+          minimumQuantity,
+          itemCategoryId,
+        })
+        toast.dismiss(toastId)
+        toast.success('Item criado com sucesso!')
+      } catch (e) {
+        toast.dismiss(toastId)
+        toast.error('Erro ao criar o item!')
+      }
+    },
+  })
+
   const form = useForm<z.infer<typeof schema>>({
     defaultValues: {
-      nome: '',
-      categoryId: '',
+      name: '',
+      itemCategoryId: '',
     },
   })
 
@@ -37,14 +59,19 @@ export default function NewItemPage() {
       label: category.name,
     })) ?? []
 
-  const categoryId = form.watch('categoryId')
+  const itemCategoryId = form.watch('itemCategoryId')
 
   function handleSubmit(data: z.infer<typeof schema>) {
-    // Aqui você pode adicionar a lógica para enviar os dados para o backend
-    console.log('Dados do formulário:', data)
-    // Resetar o formulário após o envio
-    form.reset()
-    queryClient.invalidateQueries()
+    if (saveNewItemMutation.isPending) return
+    saveNewItemMutation
+      .mutateAsync(data)
+      .then(() => {
+        form.reset()
+      })
+      .finally(() => {
+        queryClient.invalidateQueries()
+        saveNewItemMutation.reset()
+      })
   }
 
   return (
@@ -68,18 +95,29 @@ export default function NewItemPage() {
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="nome">Nome do Item</Label>
-                <Input {...form.register('nome')} placeholder="Digite o nome do item" />
+                <Input {...form.register('name')} placeholder="Digite o nome do item" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="nome">Nome do Item</Label>
+                <Input
+                  {...form.register('minimumQuantity')}
+                  type="number"
+                  placeholder="Digite a quantidade"
+                />
               </div>
               <div className="space-y-2">
                 <SelectWithSearch
-                  value={categoryId}
-                  onChange={(value) => form.setValue('categoryId', value)}
+                  value={itemCategoryId}
+                  onChange={(value) => form.setValue('itemCategoryId', value)}
                   placeholder="Selecione uma categoria"
                   options={options}
                 />
               </div>
               <Button type="submit" className="w-full">
                 Adicionar Item
+                {saveNewItemMutation.isPending && (
+                  <LoaderIcon className="ml-2 h-4 w-4 animate-spin" />
+                )}
               </Button>
             </form>
           </Form>

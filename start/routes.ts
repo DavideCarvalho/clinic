@@ -40,15 +40,21 @@ router
 
     router
       .group(() => {
-        router.post('/clinic/', '#controllers/inventory_controller.createItem')
-        router.post('/clinic/:id/add', '#controllers/inventory_controller.increaseItemQuantity')
+        router.post('/clinic/items', '#controllers/inventory_controller.createItem')
         router.post(
-          '/clinic/:id/withdraw',
+          '/clinic/items/:id/add',
+          '#controllers/inventory_controller.increaseItemQuantity'
+        )
+        router.post(
+          '/clinic/items/:id/withdraw',
           '#controllers/inventory_controller.decreaseItemQuantity'
         )
-        router.post('/clinic/more-utilized', '#controllers/inventory_controller.moreUtilizedItems')
+        router.post(
+          '/clinic/items/more-utilized',
+          '#controllers/inventory_controller.moreUtilizedItems'
+        )
         router.get(
-          '/items-needing-replacement',
+          '/clinic/items/needing-replacement',
           '#controllers/inventory_controller.itemsNeedingReplacement'
         )
         router.get('/clinic/inventory-value', '#controllers/inventory_controller.inventoryValue')

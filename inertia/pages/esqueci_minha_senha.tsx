@@ -28,9 +28,7 @@ export default function Component() {
     resolver: zodResolver(schema),
   })
 
-  function onSubmit(data: z.infer<typeof schema>) {
-    console.log(data)
-  }
+  function onSubmit(data: z.infer<typeof schema>) {}
 
   return (
     <Form {...form}>

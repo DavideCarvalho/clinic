@@ -37,7 +37,7 @@ export function SelectWithSearch({ value, placeholder, onChange, options }: Sele
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between"
+          className="w-full justify-between"
         >
           {value
             ? options.find((option) => option.value === value)?.label
@@ -45,7 +45,7 @@ export function SelectWithSearch({ value, placeholder, onChange, options }: Sele
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className="w-full p-0">
         <Command>
           <CommandInput placeholder="Pesquisar..." />
           <CommandList>
@@ -56,12 +56,13 @@ export function SelectWithSearch({ value, placeholder, onChange, options }: Sele
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    onChange(currentValue === value ? '' : currentValue)
+                    if (currentValue === value) return
+                    onChange(currentValue)
                     setOpen(false)
                   }}
                 >
                   {value === option.value ? <Check /> : null}
-                  <p className="">{option.label}</p>
+                  {option.label}
                 </CommandItem>
               ))}
             </CommandGroup>

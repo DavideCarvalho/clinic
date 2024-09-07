@@ -18,12 +18,14 @@ export default class ItemsController {
    * @requestBody <createItemValidator>
    */
   async createItem({ request, auth }: HttpContext) {
-    if (!auth.user) throw new Error('Unauthorized')
     const payload = await request.validateUsing(createItemValidator)
     return Item.create({
       name: payload.name,
-      quantity: payload.quantity,
+      quantity: 0,
+      minimumQuantity: payload.minimumQuantity,
       itemCategoryId: payload.itemCategoryId,
+      createdById: auth.user!.id,
+      updatedById: auth.user!.id,
     })
   }
 

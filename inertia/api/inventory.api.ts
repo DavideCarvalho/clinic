@@ -15,7 +15,7 @@ export type DeepNonFunctionAndNonDollarProperties<T> = {
 export function getItemsNeedingReplacement(): Promise<
   Pageable<DeepNonFunctionAndNonDollarProperties<Item>>
 > {
-  return fetch('/api/v1/clinic/inventory/items-needing-replacement').then((res) => {
+  return fetch('/api/v1/clinic/inventory/items/needing-replacement').then((res) => {
     if (!res.ok) throw new Error(res.statusText)
     return res.json()
   })
@@ -40,7 +40,7 @@ export type GetClinicItemsResponse = DeepNonFunctionAndNonDollarProperties<
 >[]
 
 export function getClinicItems(): Promise<GetClinicItemsResponse> {
-  return fetch('/api/v1/clinic/inventory/clinic/items').then((res) => {
+  return fetch('/api/v1/clinic/inventory/items').then((res) => {
     if (!res.ok) throw new Error(res.statusText)
     return res.json()
   })
@@ -49,7 +49,28 @@ export function getClinicItems(): Promise<GetClinicItemsResponse> {
 export type GetClinicItemCategoriesResponse = DeepNonFunctionAndNonDollarProperties<ItemCategory>[]
 
 export function getClinicItemCategories(): Promise<GetClinicItemCategoriesResponse> {
-  return fetch('/api/v1/clinic/inventory/clinic/items/categories').then((res) => {
+  return fetch('/api/v1/inventory/clinic/items/categories').then((res) => {
+    if (!res.ok) throw new Error(res.statusText)
+    return res.json()
+  })
+}
+
+export interface CreateItemBody {
+  name: string
+  minimumQuantity: number
+  itemCategoryId: string
+}
+
+export function createItem(
+  data: CreateItemBody
+): Promise<DeepNonFunctionAndNonDollarProperties<Item>> {
+  return fetch('/api/v1/inventory/clinic/items', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  }).then((res) => {
     if (!res.ok) throw new Error(res.statusText)
     return res.json()
   })
