@@ -81,7 +81,6 @@ export default class Item extends BaseUUIDModel {
     `,
       [clinicId]
     )
-    console.log('response', response)
     return response.map((item) => ({
       id: item.id,
       name: item.name,
