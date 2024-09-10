@@ -10,7 +10,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ClinicLayout } from '~/layouts/clinic_layout'
-import { Plus as PlusIcon } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -30,7 +29,7 @@ export default function ItemsPage() {
   })
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
-  const [data, setData] = useState<GetClinicItemsResponse>([])
+  const [data, setData] = useState<GetClinicItemsResponse>(items ?? [])
   const [sortConfig, setSortConfig] = useState<{
     key: keyof GetClinicItemsResponse[0]
     direction: 'asc' | 'desc'
@@ -83,11 +82,9 @@ export default function ItemsPage() {
   return (
     <div className="container mx-auto py-10">
       <div className="flex justify-end">
-        <Button variant="default" className="bg-purple-600 hover:bg-purple-700 text-white">
-          <Link href="/inventario/novo-item" className="text-sm">
-            + Adicionar Item
-          </Link>
-        </Button>
+        <Link href="/inventario/novo-item">
+          <Button>+ Adicionar Item</Button>
+        </Link>
       </div>
 
       <div className="flex justify-between items-center mb-4">
@@ -128,7 +125,7 @@ export default function ItemsPage() {
             </TableHead>
             <TableHead>
               <Button variant="ghost" onClick={() => sortItems('name')}>
-                Preço
+                Valor de inventário
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>

@@ -171,7 +171,22 @@ router
     })
   })
   .use(middleware.auth())
-router.on('/inventario').renderInertia('inventario/itens').use(middleware.auth())
+router
+  .on('/inventario')
+  .setHandler(async (ctx) => {
+    const user = await ctx.auth.user
+    const queryClient = getQueryClient()
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: ['inventory', 'items'],
+        queryFn: () => Item.getClinicItems(user!.clinicId),
+      }),
+    ])
+    return ctx.inertia.render('inventario/itens', {
+      ...returnDehydratedState(queryClient),
+    })
+  })
+  .use(middleware.auth())
 router.on('/login').renderInertia('login').use(middleware.guest())
 router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha').use(middleware.guest())
 

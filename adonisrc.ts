@@ -44,7 +44,9 @@ export default defineConfig({
     () => import('@adonisjs/inertia/inertia_provider'),
     () => import('@adonisjs/mail/mail_provider'),
     () => import('@adonisjs/drive/drive_provider'),
-    () => import('@adonisjs/redis/redis_provider')
+    () => import('@adonisjs/redis/redis_provider'),
+    () => import('@adonisjs/transmit/transmit_provider'),
+    () => import('@adonisjs/limiter/limiter_provider')
   ],
 
   /*

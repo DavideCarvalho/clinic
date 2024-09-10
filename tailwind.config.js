@@ -1,8 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	darkMode: ["class"],
+  darkMode: ["class"],
 	content: ["./inertia/**/*.{js,ts,jsx,tsx}"],
-	prefix: "",
+  prefix: "",
 	theme: {
 		container: {
 			center: true,

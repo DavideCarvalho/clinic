@@ -6,8 +6,8 @@ export function ClinicLayout({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col min-h-screen">
       <header className="bg-primary text-primary-foreground py-4 px-6 flex items-center justify-between">
         <div className="flex items-center gap-4 ">
-          <ContactIcon className="w-6 h-6 text-purple-400" />
-          <h1 className="text-xl font-bold text-purple-400">Clinicare</h1>
+          <ContactIcon className="w-6 h-6" />
+          <h1 className="text-xl font-bold">Clinicare</h1>
         </div>
         <nav className="flex items-center gap-4">
           <Link href="/" className="hover:underline">
