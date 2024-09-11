@@ -129,6 +129,12 @@ export default function ItemsPage() {
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
+            <TableHead>
+              <Button variant="ghost" onClick={() => sortItems('name')}>
+                Ações
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
             <TableHead className="w-[300px]">Descrição</TableHead>
           </TableRow>
         </TableHeader>
@@ -144,6 +150,17 @@ export default function ItemsPage() {
                 })}
               </TableCell>
               <TableCell>{item.name}</TableCell>
+              <TableCell>
+                <Button variant="ghost">
+                  Editar
+                </Button>
+                <Button variant="ghost">
+                  Excluir
+                </Button>
+                <Button variant="ghost">
+                  Pedir item
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

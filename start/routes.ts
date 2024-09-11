@@ -17,6 +17,8 @@ import swagger from '#config/swagger'
 import Item from '#models/item'
 import ItemUnit from '#models/item_unit'
 import ItemCategory from '#models/item_category'
+import transmit from '@adonisjs/transmit/services/main'
+import { throttle } from './limiter.js'
 
 // API routes
 router
@@ -199,4 +201,15 @@ router.get('/docs', async () => {
   return AutoSwagger.default.ui('/swagger', swagger)
   // return AutoSwagger.default.scalar("/swagger"); to use Scalar instead
   // return AutoSwagger.default.rapidoc("/swagger", "view"); to use RapiDoc instead (pass "view" default, or "read" to change the render-style)
+})
+
+transmit.registerRoutes((route) => {
+  // Ensure you are authenticated to register your client
+  if (route.getPattern() === '__transmit/events') {
+    route.middleware(middleware.auth())
+    return
+  }
+
+  // Add a throttle middleware to other transmit routes
+  route.use(throttle)
 })
