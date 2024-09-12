@@ -72,12 +72,9 @@ export default function OrdemsDeCompraPage() {
     },
   ]
 
-  const handleSubmitChegada = (data: { quantidade: number; dataChegada: Date }) => {
+  const handleSubmitChegada = (data: { dataChegada: Date }) => {
     if (solicitacaoSelecionada && itemSelecionado) {
       console.log('Chegada registrada', {
-        solicitacao: solicitacaoSelecionada.numero,
-        item: itemSelecionado.nome,
-        quantidade: data.quantidade,
         dataChegada: data.dataChegada,
       })
       // Aqui você implementaria a lógica para atualizar o estado da aplicação
