@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDown, ChevronRight, ChevronUp, ChevronsUpDown } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -96,11 +96,22 @@ export default function ExpandableTable<T extends RowData>({
                     {header.isPlaceholder ? null : (
                       <div
                         {...{
-                          className: header.column.getCanSort() ? 'cursor-pointer select-none' : '',
+                          className: header.column.getCanSort()
+                            ? 'cursor-pointer select-none flex items-center'
+                            : '',
                           onClick: header.column.getToggleSortingHandler(),
                         }}
                       >
                         {flexRender(header.column.columnDef.header, header.getContext())}
+                        <span className="ml-2">
+                          {{
+                            asc: <ChevronUp className="h-4 w-4" />,
+                            desc: <ChevronDown className="h-4 w-4" />,
+                          }[header.column.getIsSorted() as string] ??
+                            (header.column.getCanSort() ? (
+                              <ChevronsUpDown className="h-4 w-4" />
+                            ) : null)}
+                        </span>
                       </div>
                     )}
                   </TableHead>
