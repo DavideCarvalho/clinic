@@ -21,20 +21,13 @@ type ModalChegadaProps = {
   onClose: () => void
   onSubmit: (data: FormValues) => void
   itemNome: string
-  quantidadeMaxima: number
 }
 
 type FormValues = {
   dataChegada: Date
 }
 
-export default function ModalChegada({
-  isOpen,
-  onClose,
-  onSubmit,
-  itemNome,
-  quantidadeMaxima,
-}: ModalChegadaProps) {
+export default function ModalChegada({ isOpen, onClose, onSubmit, itemNome }: ModalChegadaProps) {
   const form = useForm<FormValues>({
     defaultValues: {
       dataChegada: new Date(),

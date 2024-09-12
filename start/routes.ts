@@ -74,6 +74,13 @@ router
       .prefix('/v1/inventory')
       .use(middleware.auth())
 
+    router
+      .group(() => {
+        router.get('/clinic', '#controllers/purchase_requests_controller.getClinicPurchaseRequests')
+      })
+      .prefix('/v1/purchase-requests')
+      .use(middleware.auth())
+
     router.post('/login', '#controllers/login_controller.login')
     router.post('/logout', '#controllers/login_controller.logout')
     router.post('/users', '#controllers/users_controller.createUser')
