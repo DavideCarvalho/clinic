@@ -4,7 +4,7 @@ import { ContactIcon } from 'lucide-react'
 export function ClinicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="bg-primary text-primary-foreground py-4 px-6 flex items-center justify-between">
+      <header className="bg-primary py-4 px-6 flex items-center justify-between">
         <div className="flex items-center gap-4 ">
           <ContactIcon className="w-6 h-6" />
           <h1 className="text-xl font-bold">Clinicare</h1>

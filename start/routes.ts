@@ -189,6 +189,10 @@ router
     })
   })
   .use(middleware.auth())
+router
+  .on('/ordens-de-compra')
+  .renderInertia('ordem_de_compra/ordems_de_compra')
+  .use(middleware.auth())
 router.on('/login').renderInertia('login').use(middleware.guest())
 router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha').use(middleware.guest())
 
