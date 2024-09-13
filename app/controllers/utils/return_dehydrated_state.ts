@@ -21,7 +21,6 @@ export function getQueryClient(): QueryClient {
   })
 }
 
-// TODO: take a look at this: https://tanstack.com/query/latest/docs/framework/react/guides/advanced-ssr#prefetching-and-dehydrating-data
 export function returnDehydratedState(client: QueryClient) {
   const dehydratedState = dehydrate(client, {
     shouldDehydrateQuery: (query) =>

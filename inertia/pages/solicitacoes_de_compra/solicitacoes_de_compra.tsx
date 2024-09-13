@@ -17,6 +17,7 @@ import {
   GetClinicPurchaseRequestsResponse,
 } from '~/api/purchase-request.api'
 import { useQuery } from '@tanstack/react-query'
+import { format } from 'date-fns'
 
 export default function OrdemsDeCompraPage() {
   const [modalChegadaAberto, setModalChegadaAberto] = useState(false)
@@ -33,8 +34,8 @@ export default function OrdemsDeCompraPage() {
   const columns: Column<GetClinicPurchaseRequestsResponse[0]>[] = [
     { header: 'Quantidade de itens', accessorFn: (row) => row.purchaseRequestItems.length },
     {
-      header: 'Data',
-      accessorKey: 'data',
+      header: 'Criado em',
+      accessorFn: (row) => format(row.createdAt, 'dd/MM/yyyy'),
     },
     {
       header: 'Status',

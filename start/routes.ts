@@ -19,6 +19,7 @@ import ItemUnit from '#models/item_unit'
 import ItemCategory from '#models/item_category'
 import transmit from '@adonisjs/transmit/services/main'
 import { throttle } from './limiter.js'
+import PurchaseRequest from '#models/purchase_request'
 
 // API routes
 router
@@ -197,8 +198,28 @@ router
   })
   .use(middleware.auth())
 router
-  .on('/ordens-de-compra')
-  .renderInertia('ordem_de_compra/ordems_de_compra')
+  .on('/solicitacoes-de-compra')
+  .setHandler(async (ctx) => {
+    const user = await ctx.auth.user
+    const queryClient = getQueryClient()
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: ['purchase-requests', 'clinic'],
+        queryFn: async () => {
+          const purchaseRequests = await PurchaseRequest.query()
+            .where('clinicId', user!.clinicId)
+            .preload('purchaseRequestItems', (purchaseRequestItemsQuery) => {
+              purchaseRequestItemsQuery.preload('item')
+            })
+            .preload('itemSupplier')
+          return purchaseRequests.map((purchaseRequests) => purchaseRequests.toJSON())
+        },
+      }),
+    ])
+    return ctx.inertia.render('solicitacoes_de_compra/solicitacoes_de_compra', {
+      ...returnDehydratedState(queryClient),
+    })
+  })
   .use(middleware.auth())
 router.on('/login').renderInertia('login').use(middleware.guest())
 router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha').use(middleware.guest())

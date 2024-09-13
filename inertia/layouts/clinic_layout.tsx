@@ -13,6 +13,9 @@ export function ClinicLayout({ children }: { children: React.ReactNode }) {
           <Link href="/" className="hover:underline">
             Dashboard
           </Link>
+          <Link href="/solicitacoes-de-compra" className="hover:underline">
+            Solicitação de Compra
+          </Link>
           <Link href="/inventario" className="hover:underline">
             Inventário
           </Link>
