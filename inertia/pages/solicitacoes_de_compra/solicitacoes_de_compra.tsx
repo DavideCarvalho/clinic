@@ -22,7 +22,7 @@ import { format } from 'date-fns'
 export default function OrdemsDeCompraPage() {
   const [modalChegadaAberto, setModalChegadaAberto] = useState(false)
   const [itemSelecionado, setItemSelecionado] = useState<
-    GetClinicPurchaseRequestsResponse[0] | null
+    GetClinicPurchaseRequestsResponse[0]['purchaseRequestItems'][0]['item'] | null
   >(null)
   const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState<
     GetClinicPurchaseRequestsResponse[0] | null
@@ -75,9 +75,9 @@ export default function OrdemsDeCompraPage() {
     solicitacao: GetClinicPurchaseRequestsResponse[0],
     item: GetClinicPurchaseRequestsResponse[0]['purchaseRequestItems'][0]['item']
   ) => {
-    // setSolicitacaoSelecionada(solicitacao)
-    // setItemSelecionado(item)
-    // setModalChegadaAberto(true)
+    setSolicitacaoSelecionada(solicitacao)
+    setItemSelecionado(item)
+    setModalChegadaAberto(true)
   }
 
   const handleRegistrarErro = (

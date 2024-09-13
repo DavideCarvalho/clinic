@@ -20,6 +20,25 @@ import ItemCategory from '#models/item_category'
 import transmit from '@adonisjs/transmit/services/main'
 import { throttle } from './limiter.js'
 import PurchaseRequest from '#models/purchase_request'
+import mail from '@adonisjs/mail/services/main'
+import queue from '@rlanz/bull-queue/services/main'
+import SendEmail from '../app/jobs/send_email.js'
+
+mail.setMessenger((mailer) => {
+  return {
+    async queue(mailMessage, config) {
+      queue.dispatch(
+        SendEmail,
+        {
+          mailMessage,
+          config,
+          mailerName: mailer.name,
+        },
+        { attempts: 3 }
+      )
+    },
+  }
+})
 
 // API routes
 router

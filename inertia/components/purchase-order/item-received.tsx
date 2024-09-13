@@ -15,16 +15,20 @@ import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Button } from '@/components/ui/button'
 import GenericModal from '../common/generic-submit-modal'
+import { z } from 'zod'
+
+const schema = z.object({
+  dataChegada: z.date(),
+  invoice: z.instanceof(File),
+})
+
+type FormValues = z.infer<typeof schema>
 
 type ModalChegadaProps = {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: FormValues) => void
   itemNome: string
-}
-
-type FormValues = {
-  dataChegada: Date
 }
 
 export default function ModalChegada({ isOpen, onClose, onSubmit, itemNome }: ModalChegadaProps) {
@@ -83,6 +87,27 @@ export default function ModalChegada({ isOpen, onClose, onSubmit, itemNome }: Mo
                     />
                   </PopoverContent>
                 </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="invoice"
+            rules={{ required: 'Nota fiscal é obrigatória' }}
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel htmlFor="invoice">Nota fiscal</FormLabel>
+                <Input
+                  id="invoice"
+                  type="file"
+                  accept="application/pdf"
+                  className="hover:border-primary cursor-pointer"
+                  onChange={(event) => {
+                    if (!event.target.files?.length) return
+                    field.onChange(event.target.files[0])
+                  }}
+                />
                 <FormMessage />
               </FormItem>
             )}
