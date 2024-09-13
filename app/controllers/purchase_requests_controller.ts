@@ -35,4 +35,18 @@ export default class PurchaseRequestsController {
     })
     return purchaseRequest
   }
+
+  public async clinicReceivedPurchaseRequest({ request, auth }: HttpContext) {
+    const clinic = auth.user!.clinic
+    const payload = await request.validateUsing(clinicReceivedPurchaseRequestValidator)
+    const purchaseRequest = await PurchaseRequest.query()
+      .where('id', payload.params.id)
+      .andWhere('clinicId', clinic.id)
+      .first()
+    if (!purchaseRequest) throw new Error('Purchase request not found')
+    if (purchaseRequest.status !== 'WAITING_SUPPLIER_SUBMISSION') throw new Error('Invalid status')
+    purchaseRequest.status = 'WAITING_CLINIC_APPROVAL'
+    await purchaseRequest.save()
+    return purchaseRequest
+  }
 }

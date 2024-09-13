@@ -10,6 +10,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ClinicLayout } from '~/layouts/clinic_layout'
+import { ArrowDown } from 'lucide-react'
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getClinicItems, GetClinicItemsResponse } from '~/api/inventory.api'
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@inertiajs/react'
+import { cn } from '~/lib/utils'
 
 export default function ItemsPage() {
   const { data: items, status: itemsStatus } = useQuery({
@@ -124,6 +126,12 @@ export default function ItemsPage() {
               </Button>
             </TableHead>
             <TableHead>
+              <Button variant="ghost" onClick={() => sortItems('quantity')}>
+                Quantidade mínima
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead>
               <Button variant="ghost" onClick={() => sortItems('name')}>
                 Valor de inventário
                 <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -135,14 +143,27 @@ export default function ItemsPage() {
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
-            <TableHead className="w-[300px]">Descrição</TableHead>
+            <TableHead className="w-[300px]">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {paginatedItems.map((item) => (
             <TableRow key={item.id}>
               <TableCell className="font-medium">{item.name}</TableCell>
-              <TableCell>{item.quantity}</TableCell>
+              <TableCell
+                className={cn('text-sm', item.quantity < item.minimumQuantity && 'text-red-500')}
+              >
+                {item.quantity}
+                {item.quantity < item.minimumQuantity && (
+                  <>
+                    <span className="ml-1 text-sm text-red-500">
+                      ({item.minimumQuantity - item.quantity})
+                    </span>
+                    <ArrowDown className="ml-1 inline-block h-4 w-4 text-red-500" />
+                  </>
+                )}
+              </TableCell>
+              <TableCell>{item.minimumQuantity}</TableCell>
               <TableCell>
                 {(item.inventoryValue / 100).toLocaleString('pt-BR', {
                   style: 'currency',
@@ -151,15 +172,9 @@ export default function ItemsPage() {
               </TableCell>
               <TableCell>{item.name}</TableCell>
               <TableCell>
-                <Button variant="ghost">
-                  Editar
-                </Button>
-                <Button variant="ghost">
-                  Excluir
-                </Button>
-                <Button variant="ghost">
-                  Pedir item
-                </Button>
+                <Button variant="ghost">Editar</Button>
+                <Button variant="ghost">Excluir</Button>
+                <Button variant="ghost">Pedir item</Button>
               </TableCell>
             </TableRow>
           ))}

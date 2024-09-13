@@ -16,6 +16,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Button } from '@/components/ui/button'
 import GenericModal from '../common/generic-submit-modal'
 import { z } from 'zod'
+import { GetClinicPurchaseRequestsResponse } from '~/api/purchase-request.api'
 
 const schema = z.object({
   dataChegada: z.date(),
@@ -28,10 +29,10 @@ type ModalChegadaProps = {
   isOpen: boolean
   onClose: () => void
   onSubmit: (data: FormValues) => void
-  itemNome: string
+  purchaseRequest: GetClinicPurchaseRequestsResponse[0]
 }
 
-export default function ModalChegada({ isOpen, onClose, onSubmit, itemNome }: ModalChegadaProps) {
+export function ModalChegada({ isOpen, onClose, onSubmit, purchaseRequest }: ModalChegadaProps) {
   const form = useForm<FormValues>({
     defaultValues: {
       dataChegada: new Date(),
@@ -48,7 +49,7 @@ export default function ModalChegada({ isOpen, onClose, onSubmit, itemNome }: Mo
       isOpen={isOpen}
       onClose={onClose}
       onSubmit={form.handleSubmit(handleSubmit)}
-      title={`Registrar Chegada - ${itemNome}`}
+      title={'Registrar Chegada'}
       submitLabel="Salvar"
       closeLabel="Cancelar"
       isSubmitDisabled={!form.formState.isValid}
@@ -112,6 +113,33 @@ export default function ModalChegada({ isOpen, onClose, onSubmit, itemNome }: Mo
               </FormItem>
             )}
           />
+          {purchaseRequest.purchaseRequestItems.map((purchaseRequestItem) => {
+            return (
+              <FormField
+                control={form.control}
+                name={`item-${purchaseRequestItem.id}`}
+                rules={{ required: 'Item é obrigatório' }}
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel htmlFor={`item-${purchaseRequestItem.id}`}>
+                      {purchaseRequestItem.item.name}
+                    </FormLabel>
+                    <Input
+                      id={`item-${purchaseRequestItem.id}`}
+                      type="number"
+                      min="0"
+                      className="hover:border-primary cursor-pointer"
+                      onChange={(event) => {
+                        if (!event.target.files?.length) return
+                        field.onChange(event.target.files[0])
+                      }}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )
+          })}
         </form>
       </Form>
     </GenericModal>

@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { ClinicLayout } from '~/layouts/clinic_layout'
 import ExpandableTable, { Column } from '~/components/common/expandable-table'
-import ModalChegada from '~/components/purchase-order/item-received'
+import { ModalChegada } from '~/components/purchase-order/purchase-request-received'
 import {
   getClinicPurchaseRequests,
   GetClinicPurchaseRequestsResponse,
@@ -21,9 +21,6 @@ import { format } from 'date-fns'
 
 export default function OrdemsDeCompraPage() {
   const [modalChegadaAberto, setModalChegadaAberto] = useState(false)
-  const [itemSelecionado, setItemSelecionado] = useState<
-    GetClinicPurchaseRequestsResponse[0]['purchaseRequestItems'][0]['item'] | null
-  >(null)
   const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState<
     GetClinicPurchaseRequestsResponse[0] | null
   >(null)
@@ -58,10 +55,27 @@ export default function OrdemsDeCompraPage() {
         return undefined
       },
     },
+    {
+      header: 'Ações',
+      cell: ({ row }) => {
+        return (
+          <div className="flex space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleRegistrarChegada(row.original)}
+            >
+              <PackageCheck className="mr-2 h-4 w-4" />
+              Registrar chegada
+            </Button>
+          </div>
+        )
+      },
+    },
   ]
 
   const handleSubmitChegada = (data: { dataChegada: Date }) => {
-    if (solicitacaoSelecionada && itemSelecionado) {
+    if (solicitacaoSelecionada) {
       console.log('Chegada registrada', {
         dataChegada: data.dataChegada,
       })
@@ -71,19 +85,12 @@ export default function OrdemsDeCompraPage() {
     setModalChegadaAberto(false)
   }
 
-  const handleRegistrarChegada = (
-    solicitacao: GetClinicPurchaseRequestsResponse[0],
-    item: GetClinicPurchaseRequestsResponse[0]['purchaseRequestItems'][0]['item']
-  ) => {
+  const handleRegistrarChegada = (solicitacao: GetClinicPurchaseRequestsResponse[0]) => {
     setSolicitacaoSelecionada(solicitacao)
-    setItemSelecionado(item)
     setModalChegadaAberto(true)
   }
 
-  const handleRegistrarErro = (
-    solicitacao: GetClinicPurchaseRequestsResponse[0],
-    item: GetClinicPurchaseRequestsResponse[0]['purchaseRequestItems'][0]['item']
-  ) => {
+  const handleRegistrarErro = (solicitacao: GetClinicPurchaseRequestsResponse[0]) => {
     // console.log('Registrar erro', solicitacao.numero, item.nome)
   }
 
@@ -94,7 +101,6 @@ export default function OrdemsDeCompraPage() {
           <TableHead className="w-[200px]">Item</TableHead>
           <TableHead>Quantidade Necessária</TableHead>
           <TableHead>Quantidade Pedida</TableHead>
-          <TableHead>Ações</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -103,27 +109,6 @@ export default function OrdemsDeCompraPage() {
             <TableCell>{purchaseRequestItem.item.name}</TableCell>
             <TableCell>{purchaseRequestItem.quantityNeeded}</TableCell>
             <TableCell>{purchaseRequestItem.quantityBought}</TableCell>
-            <TableCell>
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleRegistrarChegada(row, purchaseRequestItem.item)}
-                >
-                  <PackageCheck className="mr-2 h-4 w-4" />
-                  Chegou
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleRegistrarErro(row, purchaseRequestItem.item)}
-                  className="bg-red-500 text-white hover:bg-red-600"
-                >
-                  <PackageX className="mr-2 h-4 w-4" />
-                  Errado
-                </Button>
-              </div>
-            </TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -142,12 +127,12 @@ export default function OrdemsDeCompraPage() {
         renderSubComponent={renderSubComponent}
         getRowCanExpand={getRowCanExpand}
       />
-      {itemSelecionado && (
+      {solicitacaoSelecionada && (
         <ModalChegada
           isOpen={modalChegadaAberto}
           onClose={() => setModalChegadaAberto(false)}
           onSubmit={handleSubmitChegada}
-          itemNome={''}
+          purchaseRequest={solicitacaoSelecionada}
         />
       )}
     </div>
