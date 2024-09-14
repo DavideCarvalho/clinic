@@ -28,6 +28,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { useQuery } from '@tanstack/react-query'
@@ -139,7 +140,7 @@ export function NewPurchaseRequestModal({
                             className={`w-full justify-between ${!field.value && 'text-muted-foreground'}`}
                           >
                             {field.value
-                              ? items?.find((item) => item.id === field.value)?.id
+                              ? items?.find((item) => item.id === field.value)?.name
                               : 'Selecione um item'}
                           </Button>
                         </FormControl>
@@ -147,20 +148,22 @@ export function NewPurchaseRequestModal({
                       <PopoverContent className="w-[200px] p-0">
                         <Command>
                           <CommandInput placeholder="Buscar item..." />
-                          <CommandEmpty>Nenhum item encontrado.</CommandEmpty>
-                          <CommandGroup>
-                            {items?.map((item) => (
-                              <CommandItem
-                                key={item.id}
-                                value={item.name}
-                                onSelect={() => {
-                                  form.setValue(`itens.${index}.id`, item.id)
-                                }}
-                              >
-                                {item.name}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
+                          <CommandList>
+                            <CommandEmpty>Nenhum item encontrado.</CommandEmpty>
+                            <CommandGroup>
+                              {items?.map((item) => (
+                                <CommandItem
+                                  key={item.id}
+                                  value={item.name}
+                                  onSelect={() => {
+                                    form.setValue(`itens.${index}.id`, item.id)
+                                  }}
+                                >
+                                  {item.name}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
                         </Command>
                       </PopoverContent>
                     </Popover>
