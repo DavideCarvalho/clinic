@@ -1,6 +1,6 @@
 'use client'
 
-import { useForm, useFieldArray } from 'react-hook-form'
+import { useForm, useFieldArray, useWatch } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
@@ -82,9 +82,21 @@ export function NewPurchaseRequestModal({
     name: 'itens',
   })
 
+  const watchedItems = useWatch({
+    control: form.control,
+    name: 'itens',
+  })
+
   const handleSubmit = (data: FormValues) => {
     onSubmit(data)
     onClose()
+  }
+
+  const selectedItemIds = watchedItems.map((item) => item.id).filter(Boolean)
+  const availableItems = items?.filter((item) => !selectedItemIds.includes(item.id)) || []
+
+  const handleRemove = (index: number) => {
+    remove(index)
   }
 
   return (
@@ -125,12 +137,13 @@ export function NewPurchaseRequestModal({
           />
 
           {fields.map((field, index) => (
-            <div key={field.id} className="flex items-end">
+            <div key={field.id} className="flex items-end space-x-2">
               <FormField
                 control={form.control}
                 name={`itens.${index}.id`}
                 render={({ field }) => (
                   <FormItem className="flex-grow">
+                    <FormLabel>Item {index + 1}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -149,9 +162,9 @@ export function NewPurchaseRequestModal({
                         <Command>
                           <CommandInput placeholder="Buscar item..." />
                           <CommandList>
-                            <CommandEmpty>Nenhum item encontrado.</CommandEmpty>
+                            <CommandEmpty>Nenhum item disponível.</CommandEmpty>
                             <CommandGroup>
-                              {items?.map((item) => (
+                              {availableItems.map((item) => (
                                 <CommandItem
                                   key={item.id}
                                   value={item.name}
@@ -189,16 +202,24 @@ export function NewPurchaseRequestModal({
                   </FormItem>
                 )}
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => append({ id: '', quantidade: 1 })}
-              >
-                <PlusIcon className="h-4 w-4" />
-              </Button>
+              {index === fields.length - 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => append({ id: '', quantidade: 1 })}
+                  disabled={availableItems.length === 0}
+                >
+                  <PlusIcon className="h-4 w-4" />
+                </Button>
+              )}
               {index > 0 && (
-                <Button type="button" variant="outline" size="icon" onClick={() => remove(index)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => handleRemove(index)}
+                >
                   <MinusIcon className="h-4 w-4" />
                 </Button>
               )}
