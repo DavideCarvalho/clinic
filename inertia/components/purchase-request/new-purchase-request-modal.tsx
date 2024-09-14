@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
-import { PlusIcon, MinusIcon } from 'lucide-react'
+import { PlusIcon, MinusIcon, XIcon } from 'lucide-react'
 import GenericModal from '../common/generic-submit-modal'
 import {
   Command,
@@ -137,25 +137,42 @@ export function NewPurchaseRequestModal({
           />
 
           {fields.map((field, index) => (
-            <div key={field.id} className="flex items-end space-x-2">
+            <div key={field.id} className="grid grid-cols-[1fr,auto,auto] gap-2 items-end">
               <FormField
                 control={form.control}
                 name={`itens.${index}.id`}
                 render={({ field }) => (
-                  <FormItem className="flex-grow">
+                  <FormItem>
                     <FormLabel>Item {index + 1}</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
-                          <Button
-                            variant="outline"
-                            role="combobox"
-                            className={`w-full justify-between ${!field.value && 'text-muted-foreground'}`}
-                          >
-                            {field.value
-                              ? items?.find((item) => item.id === field.value)?.name
-                              : 'Selecione um item'}
-                          </Button>
+                          <div className="relative">
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={`w-full justify-between ${!field.value && 'text-muted-foreground'}`}
+                            >
+                              {field.value
+                                ? items?.find((item) => item.id === field.value)?.name
+                                : 'Selecione um item'}
+                            </Button>
+                            {field.value && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="absolute right-0 top-0 h-full px-3 py-2"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  field.onChange('')
+                                }}
+                              >
+                                <XIcon className="h-4 w-4" />
+                                <span className="sr-only">Limpar seleção</span>
+                              </Button>
+                            )}
+                          </div>
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="w-[200px] p-0">
@@ -202,27 +219,29 @@ export function NewPurchaseRequestModal({
                   </FormItem>
                 )}
               />
-              {index === fields.length - 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => append({ id: '', quantidade: 1 })}
-                  disabled={availableItems.length === 0}
-                >
-                  <PlusIcon className="h-4 w-4" />
-                </Button>
-              )}
-              {index > 0 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => handleRemove(index)}
-                >
-                  <MinusIcon className="h-4 w-4" />
-                </Button>
-              )}
+              <div className="flex space-x-2">
+                {index === fields.length - 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => append({ id: '', quantidade: 1 })}
+                    disabled={availableItems.length === 0}
+                  >
+                    <PlusIcon className="h-4 w-4" />
+                  </Button>
+                )}
+                {index > 0 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleRemove(index)}
+                  >
+                    <MinusIcon className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </form>
