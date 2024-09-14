@@ -100,6 +100,13 @@ router
       .prefix('/v1/purchase-requests')
       .use(middleware.auth())
 
+    router
+      .group(() => {
+        router.get('/clinic', '#controllers/item_suppliers_controller.getClinicSuppliers')
+      })
+      .prefix('/v1/item-suppliers')
+      .use(middleware.auth())
+
     router.post('/login', '#controllers/login_controller.login')
     router.post('/logout', '#controllers/login_controller.logout')
     router.post('/users', '#controllers/users_controller.createUser')

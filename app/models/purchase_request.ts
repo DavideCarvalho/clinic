@@ -2,7 +2,7 @@ import { belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Clinic from '#models/clinic'
 import BaseUUIDModel from '#models/utils/base_uuid_model'
-import ItemSupplier from './supplier.js'
+import ItemSupplier from './item_supplier.js'
 import PurchaseRequestItem from './purchase_request_item.js'
 import { DateTime } from 'luxon'
 

@@ -14,7 +14,7 @@ import ExpandableTable, { Column } from '~/components/common/expandable-table'
 import {
   ModalChegada,
   ModalChegadaFormValues,
-} from '~/components/purchase-order/purchase-request-received-modal'
+} from '~/components/purchase-request/purchase-request-received-modal'
 import {
   getClinicPurchaseRequests,
   GetClinicPurchaseRequestsResponse,
@@ -24,10 +24,12 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { getQueryClient } from '~/lib/query_client'
+import { NewPurchaseRequestModal } from '~/components/purchase-request/new-purchase-request-modal'
 
 export default function OrdemsDeCompraPage() {
   const queryClient = getQueryClient()
   const [modalChegadaAberto, setModalChegadaAberto] = useState(false)
+  const [isNewPurchaseRequestModalOpen, setIsNewPurchaseRequestModalOpen] = useState(false)
   const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState<
     GetClinicPurchaseRequestsResponse[0] | null
   >(null)
@@ -146,6 +148,9 @@ export default function OrdemsDeCompraPage() {
   return (
     <div className="container mx-auto py-10">
       <h2 className="text-2xl font-bold mb-4">Solicitações de Compra</h2>
+      <Button size="sm" onClick={() => setIsNewPurchaseRequestModalOpen(true)}>
+        Nova Solicitação de Compra
+      </Button>
       <ExpandableTable
         data={solicitacoesCompra ?? []}
         columns={columns}
@@ -160,6 +165,11 @@ export default function OrdemsDeCompraPage() {
           purchaseRequest={solicitacaoSelecionada}
         />
       )}
+      <NewPurchaseRequestModal
+        isOpen={isNewPurchaseRequestModalOpen}
+        onClose={() => setIsNewPurchaseRequestModalOpen(false)}
+        onSubmit={() => {}}
+      />
     </div>
   )
 }
