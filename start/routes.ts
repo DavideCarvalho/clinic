@@ -21,21 +21,16 @@ import transmit from '@adonisjs/transmit/services/main'
 import { throttle } from './limiter.js'
 import PurchaseRequest from '#models/purchase_request'
 import mail from '@adonisjs/mail/services/main'
-import queue from '@rlanz/bull-queue/services/main'
-import SendEmail from '../app/jobs/send_email.js'
+import SendEmail from '#jobs/send_email'
 
 mail.setMessenger((mailer) => {
   return {
     async queue(mailMessage, config) {
-      queue.dispatch(
-        SendEmail,
-        {
-          mailMessage,
-          config,
-          mailerName: mailer.name,
-        },
-        { attempts: 3 }
-      )
+      SendEmail.dispatch({
+        mailMessage,
+        config,
+        mailerName: mailer.name,
+      })
     },
   }
 })
@@ -97,6 +92,10 @@ router
     router
       .group(() => {
         router.get('/clinic', '#controllers/purchase_requests_controller.getClinicPurchaseRequests')
+        router.post(
+          ':purchaseRequestId/clinic/received',
+          '#controllers/purchase_requests_controller.clinicReceivedPurchaseRequest'
+        )
       })
       .prefix('/v1/purchase-requests')
       .use(middleware.auth())
@@ -264,3 +263,5 @@ transmit.registerRoutes((route) => {
   // Add a throttle middleware to other transmit routes
   route.use(throttle)
 })
+
+router.jobs().use(middleware.auth())

@@ -10,6 +10,7 @@ const driveConfig = defineConfig({
    */
   services: {
     s3: services.s3({
+      forcePathStyle: true,
       credentials: {
         accessKeyId: env.get('AWS_ACCESS_KEY_ID'),
         secretAccessKey: env.get('AWS_SECRET_ACCESS_KEY'),
@@ -17,7 +18,7 @@ const driveConfig = defineConfig({
       region: env.get('AWS_REGION'),
       bucket: env.get('S3_BUCKET'),
       endpoint: env.get('S3_ENDPOINT'),
-      visibility: 'public',
+      visibility: 'private',
     }),
   },
 })

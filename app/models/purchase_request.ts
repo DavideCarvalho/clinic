@@ -4,6 +4,7 @@ import Clinic from '#models/clinic'
 import BaseUUIDModel from '#models/utils/base_uuid_model'
 import ItemSupplier from './supplier.js'
 import PurchaseRequestItem from './purchase_request_item.js'
+import { DateTime } from 'luxon'
 
 export default class PurchaseRequest extends BaseUUIDModel {
   @column()
@@ -21,6 +22,12 @@ export default class PurchaseRequest extends BaseUUIDModel {
 
   @column()
   declare boughtById: number | null
+
+  @column()
+  declare invoiceFilePath: string | null
+
+  @column.dateTime()
+  declare receivedAt: DateTime | null
 
   @belongsTo(() => Clinic)
   declare clinic: BelongsTo<typeof Clinic>

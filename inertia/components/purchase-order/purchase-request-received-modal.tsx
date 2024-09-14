@@ -1,4 +1,4 @@
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { Input } from '@/components/ui/input'
 import {
   Form,
@@ -17,29 +17,54 @@ import { Button } from '@/components/ui/button'
 import GenericModal from '../common/generic-submit-modal'
 import { z } from 'zod'
 import { GetClinicPurchaseRequestsResponse } from '~/api/purchase-request.api'
+import { useEffect } from 'react'
 
 const schema = z.object({
   dataChegada: z.date(),
   invoice: z.instanceof(File),
+  items: z.array(
+    z.object({
+      itemId: z.string(),
+      askedQuantity: z.number(),
+      receivedQuantity: z.number(),
+    })
+  ),
 })
 
-type FormValues = z.infer<typeof schema>
+export type ModalChegadaFormValues = z.infer<typeof schema>
 
 type ModalChegadaProps = {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: FormValues) => void
+  onSubmit: (data: ModalChegadaFormValues) => void
   purchaseRequest: GetClinicPurchaseRequestsResponse[0]
 }
 
 export function ModalChegada({ isOpen, onClose, onSubmit, purchaseRequest }: ModalChegadaProps) {
-  const form = useForm<FormValues>({
+  const form = useForm<ModalChegadaFormValues>({
     defaultValues: {
       dataChegada: new Date(),
     },
   })
 
-  const handleSubmit = (data: FormValues) => {
+  const fieldArray = useFieldArray({
+    control: form.control,
+    name: 'items',
+  })
+
+  useEffect(() => {
+    fieldArray.remove()
+    for (let index = 0; index < purchaseRequest.purchaseRequestItems.length; index++) {
+      const purchaseRequestItem = purchaseRequest.purchaseRequestItems[index]
+      fieldArray.insert(index, {
+        itemId: purchaseRequestItem.item.id,
+        askedQuantity: purchaseRequestItem.quantityNeeded,
+        receivedQuantity: purchaseRequestItem.quantityNeeded,
+      })
+    }
+  }, [purchaseRequest])
+
+  const handleSubmit = (data: ModalChegadaFormValues) => {
     onSubmit(data)
     onClose()
   }
@@ -113,33 +138,47 @@ export function ModalChegada({ isOpen, onClose, onSubmit, purchaseRequest }: Mod
               </FormItem>
             )}
           />
-          {purchaseRequest.purchaseRequestItems.map((purchaseRequestItem) => {
-            return (
-              <FormField
-                control={form.control}
-                name={`item-${purchaseRequestItem.id}`}
-                rules={{ required: 'Item é obrigatório' }}
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <FormLabel htmlFor={`item-${purchaseRequestItem.id}`}>
-                      {purchaseRequestItem.item.name}
-                    </FormLabel>
-                    <Input
-                      id={`item-${purchaseRequestItem.id}`}
-                      type="number"
-                      min="0"
-                      className="hover:border-primary cursor-pointer"
-                      onChange={(event) => {
-                        if (!event.target.files?.length) return
-                        field.onChange(event.target.files[0])
-                      }}
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )
-          })}
+          <div className="space-y-2 border p-3 rounded-md">
+            {fieldArray.fields.map((field, index) => {
+              const purchaseRequestItem = purchaseRequest.purchaseRequestItems.find(
+                (i) => i.item.id === field.itemId
+              )
+              if (!purchaseRequestItem) return null
+              const { item } = purchaseRequestItem
+              return (
+                <div key={field.id} className="py-2 border-b last:border-b-0">
+                  <FormLabel className="mb-1 block">{item.name}</FormLabel>
+                  <div className="flex items-center justify-between space-x-4">
+                    <span className="text-sm text-muted-foreground whitespace-nowrap">
+                      Pedido: {field.askedQuantity}
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm font-medium">Recebido:</span>
+                      <FormField
+                        control={form.control}
+                        name={`items.${index}.receivedQuantity`}
+                        rules={{ required: 'Obrigatório' }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                className="w-20"
+                                placeholder="Qtd."
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </form>
       </Form>
     </GenericModal>
