@@ -44,24 +44,28 @@ export default class PurchaseRequestsController {
   public async clinicReceivedPurchaseRequest({ request, auth }: HttpContext) {
     const clinic = auth.user!.clinic
     const payload = await request.validateUsing(clinicReceivedPurchaseRequestValidator)
-    if (payload.invoice) {
-      const buffer = Buffer.from(payload.invoice, 'base64')
-      const type = await fileTypeFromBuffer(buffer)
-      const disk = drive.use()
-      try {
-        await disk.put(
-          `/${clinic.id}/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`,
-          payload.invoice,
-          {
-            visibility: 'private',
-          }
-        )
-      } catch (e) {
-        console.log('Erro ao enviar arquivo', JSON.stringify(e))
-        throw e
-      }
-    }
+
     await db.transaction(async (trx) => {
+      const purchaseRequest = await PurchaseRequest.query({ client: trx })
+        .where('id', payload.params.purchaseRequestId)
+        .andWhere('clinicId', clinic.id)
+        .first()
+      if (!purchaseRequest) throw new Error('Purchase request not found')
+      if (payload.invoice) {
+        const buffer = Buffer.from(payload.invoice, 'base64')
+        const type = await fileTypeFromBuffer(buffer)
+        const disk = drive.use()
+        try {
+          const filePath = `/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`
+          await disk.put(filePath, payload.invoice, {
+            visibility: 'private',
+          })
+          purchaseRequest.invoiceFilePath = `/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`
+        } catch (e) {
+          console.log('Erro ao enviar arquivo', JSON.stringify(e))
+          throw e
+        }
+      }
       for (const item of payload.items) {
         const purchaseRequestItem = await PurchaseRequestItem.query({ client: trx })
           .where('purchaseRequestId', payload.params.purchaseRequestId)
@@ -71,10 +75,6 @@ export default class PurchaseRequestsController {
         purchaseRequestItem.quantityBought = item.receivedQuantity
         purchaseRequestItem.save()
       }
-      const purchaseRequest = await PurchaseRequest.query({ client: trx })
-        .where('id', payload.params.purchaseRequestId)
-        .andWhere('clinicId', clinic.id)
-        .first()
       if (!purchaseRequest) throw new Error('Purchase request not found')
       purchaseRequest.status = 'ARRIVED'
       await purchaseRequest.save()
