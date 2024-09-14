@@ -77,6 +77,7 @@ export default class PurchaseRequestsController {
       }
       if (!purchaseRequest) throw new Error('Purchase request not found')
       purchaseRequest.status = 'ARRIVED'
+      purchaseRequest.receivedAt = payload.arrivalDate
       await purchaseRequest.save()
     })
   }
