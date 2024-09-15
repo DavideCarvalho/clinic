@@ -47,12 +47,12 @@ const schema = z.object({
     .min(1, 'Adicione pelo menos um item'),
 })
 
-type FormValues = z.infer<typeof schema>
+export type NewPurchaseRequestFormValues = z.infer<typeof schema>
 
 type NewPurchaseRequestModalProps = {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: FormValues) => void
+  onSubmit: (data: NewPurchaseRequestFormValues) => void
 }
 
 export function NewPurchaseRequestModal({
@@ -69,7 +69,7 @@ export function NewPurchaseRequestModal({
     queryFn: () => getClinicSuppliers(),
   })
 
-  const form = useForm<FormValues>({
+  const form = useForm<NewPurchaseRequestFormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       fornecedor: '',
@@ -87,8 +87,8 @@ export function NewPurchaseRequestModal({
     name: 'itens',
   })
 
-  const handleSubmit = (data: FormValues) => {
-    onSubmit(data)
+  async function handleSubmit(data: NewPurchaseRequestFormValues) {
+    await onSubmit(data)
     onClose()
   }
 

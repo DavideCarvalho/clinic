@@ -19,12 +19,16 @@ import {
   getClinicPurchaseRequests,
   GetClinicPurchaseRequestsResponse,
   clinicReceivedPurchaseRequest,
+  newPurchaseRequest,
 } from '~/api/purchase-request.api'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
 import { getQueryClient } from '~/lib/query_client'
-import { NewPurchaseRequestModal } from '~/components/purchase-request/new-purchase-request-modal'
+import {
+  NewPurchaseRequestFormValues,
+  NewPurchaseRequestModal,
+} from '~/components/purchase-request/new-purchase-request-modal'
 
 export default function OrdemsDeCompraPage() {
   const queryClient = getQueryClient()
@@ -37,10 +41,33 @@ export default function OrdemsDeCompraPage() {
     queryKey: ['purchase-requests', 'clinic'],
     queryFn: () => getClinicPurchaseRequests(),
   })
+  const newPurchaseRequestMutation = useMutation({
+    mutationFn: newPurchaseRequest,
+  })
 
   const clinicReceivedPurchaseRequestMutation = useMutation({
     mutationFn: clinicReceivedPurchaseRequest,
   })
+
+  async function handleNewPurchaseRequest(data: NewPurchaseRequestFormValues) {
+    const toastId = toast.loading('Criando solicitação de compra...')
+    try {
+      await newPurchaseRequestMutation.mutateAsync({
+        supplier: data.fornecedor,
+        items: data.itens.map((item) => ({
+          id: item.id,
+          quantidade: item.quantidade,
+        })),
+      })
+      toast.dismiss(toastId)
+      toast.success('Solicitação de compra criada com sucesso!')
+    } catch (e) {
+      toast.dismiss(toastId)
+      toast.error('Erro ao criar solicitação de compra!')
+    } finally {
+      queryClient.invalidateQueries()
+    }
+  }
 
   const columns: Column<GetClinicPurchaseRequestsResponse[0]>[] = [
     { header: 'Quantidade de itens', accessorFn: (row) => row.purchaseRequestItems.length },
@@ -168,7 +195,7 @@ export default function OrdemsDeCompraPage() {
       <NewPurchaseRequestModal
         isOpen={isNewPurchaseRequestModalOpen}
         onClose={() => setIsNewPurchaseRequestModalOpen(false)}
-        onSubmit={() => {}}
+        onSubmit={handleNewPurchaseRequest}
       />
     </div>
   )

@@ -92,6 +92,7 @@ router
     router
       .group(() => {
         router.get('/clinic', '#controllers/purchase_requests_controller.getClinicPurchaseRequests')
+        router.post('/clinic', '#controllers/purchase_requests_controller.newPurchaseRequest')
         router.post(
           ':purchaseRequestId/clinic/received',
           '#controllers/purchase_requests_controller.clinicReceivedPurchaseRequest'

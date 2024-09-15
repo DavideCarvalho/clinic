@@ -13,15 +13,12 @@ export default class PurchaseRequest extends BaseUUIDModel {
   @column()
   declare clinicId: string
 
-  // PENDING | WAITING_SUPPLIER_SUBMISSION | WAITING_CLINIC_APPROVAL | WAITING_SUPPLIER_SEND | WAITING_ARRIVAL | ARRIVED
+  // WAITING_SUPPLIER_INVOICE | WAITING_CLINIC_INVOICE_APPROVAL | WAITING_SUPPLIER_SEND | WAITING_ARRIVAL | ARRIVED
   @column()
   declare status: string
 
   @column()
   declare itemSupplierId: string
-
-  @column()
-  declare boughtById: number | null
 
   @column()
   declare invoiceFilePath: string | null

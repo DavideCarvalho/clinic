@@ -17,3 +17,15 @@ export const clinicReceivedPurchaseRequestValidator = vine.compile(
     ),
   })
 )
+
+export const newPurchaseRequestValidator = vine.compile(
+  vine.object({
+    supplier: vine.string().minLength(1).trim(),
+    items: vine.array(
+      vine.object({
+        id: vine.string().minLength(1).trim(),
+        quantidade: vine.number().min(1),
+      })
+    ),
+  })
+)

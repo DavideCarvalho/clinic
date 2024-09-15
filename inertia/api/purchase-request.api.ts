@@ -40,3 +40,23 @@ export async function clinicReceivedPurchaseRequest(
     if (!res.ok) throw new Error(res.statusText)
   })
 }
+
+interface NewPurchaseRequestBody {
+  supplier: string
+  items: {
+    id: string
+    quantidade: number
+  }[]
+}
+
+export function newPurchaseRequest(data: NewPurchaseRequestBody): Promise<void> {
+  return fetch(`/api/v1/purchase-requests/clinic`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  }).then((res) => {
+    if (!res.ok) throw new Error(res.statusText)
+  })
+}
