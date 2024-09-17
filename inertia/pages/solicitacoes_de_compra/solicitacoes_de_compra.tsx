@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react'
-import { PackageCheck } from 'lucide-react'
+import { PackageCheck, Receipt, XIcon } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -79,7 +79,7 @@ export default function OrdemsDeCompraPage() {
     {
       header: 'Status',
       accessorFn: (row) => {
-        if (row.status === 'WAITING_SUPPLIER_SUBMISSION') {
+        if (row.status === 'WAITING_SUPPLIER_INVOICE') {
           return 'Aguardando resposta do fornecedor'
         }
         if (row.status === 'WAITING_CLINIC_APPROVAL') {
@@ -103,14 +103,24 @@ export default function OrdemsDeCompraPage() {
         return (
           <div className="flex space-x-2">
             {row.original.status === 'WAITING_SUPPLIER_INVOICE' && (
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => handleCancelPurchaseRequest(row.original)}
-              >
-                <PackageCheck className="mr-2 h-4 w-4" />
-                Cancelar
-              </Button>
+              <>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => handleCancelPurchaseRequest(row.original)}
+                >
+                  <Receipt className="mr-2 h-4 w-4" />
+                  Nota fiscal
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleCancelPurchaseRequest(row.original)}
+                >
+                  <XIcon className="mr-2 h-4 w-4" />
+                  Cancelar
+                </Button>
+              </>
             )}
             {row.original.status === 'WAITING_ARRIVAL' && (
               <Button
