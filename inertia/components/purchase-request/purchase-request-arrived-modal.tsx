@@ -31,22 +31,22 @@ const schema = z.object({
   ),
 })
 
-export type PurchaseRequestArrivalModalFormValues = z.infer<typeof schema>
+export type PurchaseRequestArrivedModalFormValues = z.infer<typeof schema>
 
-type PurchaseRequestArrivalModalProps = {
+type PurchaseRequestArrivedModalProps = {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: PurchaseRequestArrivalModalFormValues) => void
+  onSubmit: (data: PurchaseRequestArrivedModalFormValues) => void
   purchaseRequest: GetClinicPurchaseRequestsResponse[0]
 }
 
-export function PurchaseRequestArrivalModal({
+export function PurchaseRequestArrivedModal({
   isOpen,
   onClose,
   onSubmit,
   purchaseRequest,
-}: PurchaseRequestArrivalModalProps) {
-  const form = useForm<PurchaseRequestArrivalModalFormValues>({
+}: PurchaseRequestArrivedModalProps) {
+  const form = useForm<PurchaseRequestArrivedModalFormValues>({
     defaultValues: {
       arrivalDate: new Date(),
     },
@@ -69,7 +69,7 @@ export function PurchaseRequestArrivalModal({
     }
   }, [purchaseRequest])
 
-  const handleSubmit = (data: PurchaseRequestArrivalModalFormValues) => {
+  const handleSubmit = (data: PurchaseRequestArrivedModalFormValues) => {
     onSubmit(data)
     onClose()
   }

@@ -12,9 +12,9 @@ import { Button } from '@/components/ui/button'
 import { ClinicLayout } from '~/layouts/clinic_layout'
 import ExpandableTable, { Column } from '~/components/common/expandable-table'
 import {
-  PurchaseRequestArrivalModal,
-  PurchaseRequestArrivalModalFormValues,
-} from '~/components/purchase-request/purchase-request-received-modal'
+  PurchaseRequestArrivedModal,
+  PurchaseRequestArrivedModalFormValues,
+} from '~/components/purchase-request/purchase-request-arrived-modal'
 import {
   getClinicPurchaseRequests,
   GetClinicPurchaseRequestsResponse,
@@ -35,7 +35,7 @@ export default function OrdemsDeCompraPage() {
   const [isArrivalModalOpen, setIsArrivalModallOpen] = useState(false)
   const [isCancelPurchaseRequestModalOpen, setIsCancelPurchaseRequestModalOpen] = useState(false)
   const [isNewPurchaseRequestModalOpen, setIsNewPurchaseRequestModalOpen] = useState(false)
-  const [solicitacaoSelecionada, setSelectedPurchaseRequest] = useState<
+  const [selectedPurchaseRequest, setSelectedPurchaseRequest] = useState<
     GetClinicPurchaseRequestsResponse[0] | null
   >(null)
   const { data: solicitacoesCompra } = useQuery({
@@ -128,13 +128,13 @@ export default function OrdemsDeCompraPage() {
     },
   ]
 
-  async function handleSubmitArrival(data: PurchaseRequestArrivalModalFormValues) {
-    if (!solicitacaoSelecionada) return
-    if (solicitacaoSelecionada.status !== 'WAITING_ARRIVAL') return
+  async function handleSubmitArrival(data: PurchaseRequestArrivedModalFormValues) {
+    if (!selectedPurchaseRequest) return
+    if (selectedPurchaseRequest.status !== 'WAITING_ARRIVAL') return
     const toastId = toast.loading('Registrando chegada...')
     try {
       await clinicReceivedPurchaseRequestMutation.mutateAsync({
-        purchaseRequestId: solicitacaoSelecionada.id,
+        purchaseRequestId: selectedPurchaseRequest.id,
         arrivalDate: data.arrivalDate,
         invoice: data.invoice,
         items: data.items.map((item) => ({
@@ -160,8 +160,8 @@ export default function OrdemsDeCompraPage() {
   }
 
   const handleCancelPurchaseRequest = (purchaseRequest: GetClinicPurchaseRequestsResponse[0]) => {
-    // setSelectedPurchaseRequest(purchaseRequest)
-    // setModalCancelarSolicitacaoAberto(true)
+    setSelectedPurchaseRequest(purchaseRequest)
+    setIsCancelPurchaseRequestModalOpen(true)
   }
 
   const renderSubComponent = ({ row }: { row: GetClinicPurchaseRequestsResponse[0] }) => (
@@ -200,12 +200,20 @@ export default function OrdemsDeCompraPage() {
         renderSubComponent={renderSubComponent}
         getRowCanExpand={getRowCanExpand}
       />
-      {solicitacaoSelecionada && (
-        <PurchaseRequestArrivalModal
+      {selectedPurchaseRequest && (
+        <PurchaseRequestArrivedModal
           isOpen={isArrivalModalOpen}
           onClose={() => setIsArrivalModallOpen(false)}
           onSubmit={handleSubmitArrival}
-          purchaseRequest={solicitacaoSelecionada}
+          purchaseRequest={selectedPurchaseRequest}
+        />
+      )}
+      {selectedPurchaseRequest && (
+        <PurchaseRequestArrivedModal
+          isOpen={isArrivalModalOpen}
+          onClose={() => setIsArrivalModallOpen(false)}
+          onSubmit={handleSubmitArrival}
+          purchaseRequest={selectedPurchaseRequest}
         />
       )}
       <NewPurchaseRequestModal
