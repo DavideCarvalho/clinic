@@ -20,7 +20,7 @@ import { GetClinicPurchaseRequestsResponse } from '~/api/purchase-request.api'
 import { useEffect } from 'react'
 
 const schema = z.object({
-  dataChegada: z.date(),
+  arrivalDate: z.date(),
   invoice: z.instanceof(File),
   items: z.array(
     z.object({
@@ -31,19 +31,24 @@ const schema = z.object({
   ),
 })
 
-export type ModalChegadaFormValues = z.infer<typeof schema>
+export type PurchaseRequestArrivalModalFormValues = z.infer<typeof schema>
 
-type ModalChegadaProps = {
+type PurchaseRequestArrivalModalProps = {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (data: ModalChegadaFormValues) => void
+  onSubmit: (data: PurchaseRequestArrivalModalFormValues) => void
   purchaseRequest: GetClinicPurchaseRequestsResponse[0]
 }
 
-export function ModalChegada({ isOpen, onClose, onSubmit, purchaseRequest }: ModalChegadaProps) {
-  const form = useForm<ModalChegadaFormValues>({
+export function PurchaseRequestArrivalModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  purchaseRequest,
+}: PurchaseRequestArrivalModalProps) {
+  const form = useForm<PurchaseRequestArrivalModalFormValues>({
     defaultValues: {
-      dataChegada: new Date(),
+      arrivalDate: new Date(),
     },
   })
 
@@ -64,7 +69,7 @@ export function ModalChegada({ isOpen, onClose, onSubmit, purchaseRequest }: Mod
     }
   }, [purchaseRequest])
 
-  const handleSubmit = (data: ModalChegadaFormValues) => {
+  const handleSubmit = (data: PurchaseRequestArrivalModalFormValues) => {
     onSubmit(data)
     onClose()
   }
@@ -83,7 +88,7 @@ export function ModalChegada({ isOpen, onClose, onSubmit, purchaseRequest }: Mod
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
           <FormField
             control={form.control}
-            name="dataChegada"
+            name="arrivalDate"
             rules={{ required: 'Data de chegada é obrigatória' }}
             render={({ field }) => (
               <FormItem className="flex flex-col">

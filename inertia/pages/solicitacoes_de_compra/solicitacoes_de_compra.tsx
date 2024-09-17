@@ -12,8 +12,8 @@ import { Button } from '@/components/ui/button'
 import { ClinicLayout } from '~/layouts/clinic_layout'
 import ExpandableTable, { Column } from '~/components/common/expandable-table'
 import {
-  ModalChegada,
-  ModalChegadaFormValues,
+  PurchaseRequestArrivalModal,
+  PurchaseRequestArrivalModalFormValues,
 } from '~/components/purchase-request/purchase-request-received-modal'
 import {
   getClinicPurchaseRequests,
@@ -32,9 +32,10 @@ import {
 
 export default function OrdemsDeCompraPage() {
   const queryClient = getQueryClient()
-  const [modalChegadaAberto, setModalChegadaAberto] = useState(false)
+  const [isArrivalModalOpen, setIsArrivalModallOpen] = useState(false)
+  const [isCancelPurchaseRequestModalOpen, setIsCancelPurchaseRequestModalOpen] = useState(false)
   const [isNewPurchaseRequestModalOpen, setIsNewPurchaseRequestModalOpen] = useState(false)
-  const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState<
+  const [solicitacaoSelecionada, setSelectedPurchaseRequest] = useState<
     GetClinicPurchaseRequestsResponse[0] | null
   >(null)
   const { data: solicitacoesCompra } = useQuery({
@@ -101,6 +102,16 @@ export default function OrdemsDeCompraPage() {
       cell: ({ row }) => {
         return (
           <div className="flex space-x-2">
+            {row.original.status === 'WAITING_SUPPLIER_INVOICE' && (
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => handleRegistrarChegada(row.original)}
+              >
+                <PackageCheck className="mr-2 h-4 w-4" />
+                Cancelar
+              </Button>
+            )}
             {row.original.status === 'WAITING_ARRIVAL' && (
               <Button
                 variant="outline"
@@ -117,14 +128,14 @@ export default function OrdemsDeCompraPage() {
     },
   ]
 
-  async function handleSubmitChegada(data: ModalChegadaFormValues) {
+  async function handleSubmitArrival(data: PurchaseRequestArrivalModalFormValues) {
     if (!solicitacaoSelecionada) return
     if (solicitacaoSelecionada.status !== 'WAITING_ARRIVAL') return
     const toastId = toast.loading('Registrando chegada...')
     try {
       await clinicReceivedPurchaseRequestMutation.mutateAsync({
         purchaseRequestId: solicitacaoSelecionada.id,
-        arrivalDate: data.dataChegada,
+        arrivalDate: data.arrivalDate,
         invoice: data.invoice,
         items: data.items.map((item) => ({
           itemId: item.itemId,
@@ -140,12 +151,17 @@ export default function OrdemsDeCompraPage() {
       toast.dismiss(toastId)
       toast.error('Erro ao registrar chegada!')
     }
-    setModalChegadaAberto(false)
+    setIsArrivalModallOpen(false)
   }
 
-  const handleRegistrarChegada = (solicitacao: GetClinicPurchaseRequestsResponse[0]) => {
-    setSolicitacaoSelecionada(solicitacao)
-    setModalChegadaAberto(true)
+  const handleRegistrarChegada = (purchaseRequest: GetClinicPurchaseRequestsResponse[0]) => {
+    setSelectedPurchaseRequest(purchaseRequest)
+    setIsArrivalModallOpen(true)
+  }
+
+  const handleCancelPurchaseRequest = (purchaseRequest: GetClinicPurchaseRequestsResponse[0]) => {
+    // setSelectedPurchaseRequest(purchaseRequest)
+    // setModalCancelarSolicitacaoAberto(true)
   }
 
   const renderSubComponent = ({ row }: { row: GetClinicPurchaseRequestsResponse[0] }) => (
@@ -185,10 +201,10 @@ export default function OrdemsDeCompraPage() {
         getRowCanExpand={getRowCanExpand}
       />
       {solicitacaoSelecionada && (
-        <ModalChegada
-          isOpen={modalChegadaAberto}
-          onClose={() => setModalChegadaAberto(false)}
-          onSubmit={handleSubmitChegada}
+        <PurchaseRequestArrivalModal
+          isOpen={isArrivalModalOpen}
+          onClose={() => setIsArrivalModallOpen(false)}
+          onSubmit={handleSubmitArrival}
           purchaseRequest={solicitacaoSelecionada}
         />
       )}
