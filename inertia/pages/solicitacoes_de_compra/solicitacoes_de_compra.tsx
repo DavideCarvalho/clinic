@@ -106,7 +106,7 @@ export default function OrdemsDeCompraPage() {
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={() => handleRegistrarChegada(row.original)}
+                onClick={() => handleCancelPurchaseRequest(row.original)}
               >
                 <PackageCheck className="mr-2 h-4 w-4" />
                 Cancelar
