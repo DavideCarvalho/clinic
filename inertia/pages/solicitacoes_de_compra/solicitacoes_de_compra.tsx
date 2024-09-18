@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react'
-import { PackageCheck, Receipt, XIcon } from 'lucide-react'
+import { PackageCheck, Receipt, XIcon, FileSymlink } from 'lucide-react'
 import {
   Table,
   TableBody,
@@ -117,14 +117,26 @@ export default function OrdemsDeCompraPage() {
           <div className="flex space-x-2">
             {row.original.status === 'WAITING_SUPPLIER_INVOICE' && (
               <>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleOpenUploadInvoiceModal(row.original)}
-                >
-                  <Receipt className="mr-2 h-4 w-4" />
-                  Nota fiscal
-                </Button>
+                {!row.original.invoiceFilePath && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleOpenUploadInvoiceModal(row.original)}
+                  >
+                    <Receipt className="mr-2 h-4 w-4" />
+                    Importar Nota fiscal
+                  </Button>
+                )}
+                {row.original.invoiceFilePath && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => handleCancelPurchaseRequest(row.original)}
+                  >
+                    <FileSymlink className="mr-2 h-4 w-4" />
+                    Ver Nota fiscal
+                  </Button>
+                )}
                 <Button
                   variant="destructive"
                   size="sm"
