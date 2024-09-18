@@ -29,11 +29,13 @@ import {
   NewPurchaseRequestFormValues,
   NewPurchaseRequestModal,
 } from '~/components/purchase-request/new-purchase-request-modal'
+import { UploadInvoicePurchaseRequestModal } from '~/components/purchase-request/upload-invoice-purchase-request-modal'
 
 export default function OrdemsDeCompraPage() {
   const queryClient = getQueryClient()
   const [isArrivalModalOpen, setIsArrivalModallOpen] = useState(false)
   const [isCancelPurchaseRequestModalOpen, setIsCancelPurchaseRequestModalOpen] = useState(false)
+  const [isUploadInvoiceModalOpen, setIsUploadInvoiceModalOpen] = useState(false)
   const [isNewPurchaseRequestModalOpen, setIsNewPurchaseRequestModalOpen] = useState(false)
   const [selectedPurchaseRequest, setSelectedPurchaseRequest] = useState<
     GetClinicPurchaseRequestsResponse[0] | null
@@ -164,15 +166,23 @@ export default function OrdemsDeCompraPage() {
     setIsArrivalModallOpen(false)
   }
 
-  const handleRegistrarChegada = (purchaseRequest: GetClinicPurchaseRequestsResponse[0]) => {
+  function handleRegistrarChegada(purchaseRequest: GetClinicPurchaseRequestsResponse[0]) {
     setSelectedPurchaseRequest(purchaseRequest)
     setIsArrivalModallOpen(true)
   }
 
-  const handleCancelPurchaseRequest = (purchaseRequest: GetClinicPurchaseRequestsResponse[0]) => {
+  function handleCancelPurchaseRequest(purchaseRequest: GetClinicPurchaseRequestsResponse[0]) {
     setSelectedPurchaseRequest(purchaseRequest)
     setIsCancelPurchaseRequestModalOpen(true)
   }
+
+  async function handleUploadInvoiceSubmit({
+    file,
+    invoiceNumber,
+  }: {
+    file: File
+    invoiceNumber: string
+  }) {}
 
   const renderSubComponent = ({ row }: { row: GetClinicPurchaseRequestsResponse[0] }) => (
     <Table>
@@ -219,11 +229,11 @@ export default function OrdemsDeCompraPage() {
         />
       )}
       {selectedPurchaseRequest && (
-        <PurchaseRequestArrivedModal
-          isOpen={isArrivalModalOpen}
-          onClose={() => setIsArrivalModallOpen(false)}
-          onSubmit={handleSubmitArrival}
-          purchaseRequest={selectedPurchaseRequest}
+        <UploadInvoicePurchaseRequestModal
+          isOpen={isUploadInvoiceModalOpen}
+          onClose={() => setIsUploadInvoiceModalOpen(false)}
+          onSubmit={handleUploadInvoiceSubmit}
+          purchaseRequestId={selectedPurchaseRequest.id}
         />
       )}
       <NewPurchaseRequestModal
