@@ -252,14 +252,11 @@ export default function OrdemsDeCompraPage() {
           purchaseRequest={selectedPurchaseRequest}
         />
       )}
-      {selectedPurchaseRequest && (
-        <UploadInvoicePurchaseRequestModal
-          isOpen={isUploadInvoiceModalOpen}
-          onClose={() => setIsUploadInvoiceModalOpen(false)}
-          onSubmit={handleUploadInvoiceSubmit}
-          purchaseRequestId={selectedPurchaseRequest.id}
-        />
-      )}
+      <UploadInvoicePurchaseRequestModal
+        isOpen={isUploadInvoiceModalOpen}
+        onClose={() => setIsUploadInvoiceModalOpen(false)}
+        onSubmit={handleUploadInvoiceSubmit}
+      />
       <NewPurchaseRequestModal
         isOpen={isNewPurchaseRequestModalOpen}
         onClose={() => setIsNewPurchaseRequestModalOpen(false)}

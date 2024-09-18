@@ -21,7 +21,7 @@ import { useEffect } from 'react'
 
 const schema = z.object({
   arrivalDate: z.date(),
-  invoice: z.instanceof(File),
+  invoice: z.instanceof(File).optional(),
   items: z.array(
     z.object({
       itemId: z.string(),
@@ -122,27 +122,29 @@ export function PurchaseRequestArrivedModal({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="invoice"
-            rules={{ required: 'Nota fiscal é obrigatória' }}
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel htmlFor="invoice">Nota fiscal</FormLabel>
-                <Input
-                  id="invoice"
-                  type="file"
-                  accept="application/pdf"
-                  className="hover:border-primary cursor-pointer"
-                  onChange={(event) => {
-                    if (!event.target.files?.length) return
-                    field.onChange(event.target.files[0])
-                  }}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!purchaseRequest.invoiceFilePath && (
+            <FormField
+              control={form.control}
+              name="invoice"
+              rules={{ required: 'Nota fiscal é obrigatória' }}
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel htmlFor="invoice">Nota fiscal</FormLabel>
+                  <Input
+                    id="invoice"
+                    type="file"
+                    accept="application/pdf"
+                    className="hover:border-primary cursor-pointer"
+                    onChange={(event) => {
+                      if (!event.target.files?.length) return
+                      field.onChange(event.target.files[0])
+                    }}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
           <div className="space-y-2 border p-3 rounded-md">
             {fieldArray.fields.map((field, index) => {
               const purchaseRequestItem = purchaseRequest.purchaseRequestItems.find(
