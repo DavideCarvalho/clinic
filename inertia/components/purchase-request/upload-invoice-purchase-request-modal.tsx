@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
 import {
   Dialog,
   DialogContent,
@@ -11,36 +14,42 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Upload } from 'lucide-react'
 
+const formSchema = z.object({
+  invoiceFile: z.instanceof(File, { message: 'Invoice file is required' }),
+})
+
+type UploadInvoicePurchaseRequestModalFormValues = z.infer<typeof formSchema>
+
 interface UploadInvoicePurchaseRequestModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (invoiceData: { file: File; invoiceNumber: string }) => Promise<void>
-  purchaseRequestId: string
+  onSubmit: (invoice: File) => Promise<void>
 }
 
 export function UploadInvoicePurchaseRequestModal({
   isOpen,
   onClose,
   onSubmit,
-  purchaseRequestId,
 }: UploadInvoicePurchaseRequestModalProps) {
-  const [file, setFile] = useState<File | null>(null)
-  const [invoiceNumber, setInvoiceNumber] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
-    }
-  }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<UploadInvoicePurchaseRequestModalFormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      invoiceFile: undefined,
+    },
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!file || !invoiceNumber) return
-
+  const onSubmitForm = async (data: UploadInvoicePurchaseRequestModalFormValues) => {
     setIsSubmitting(true)
     try {
-      await onSubmit({ file, invoiceNumber })
+      await onSubmit(data.invoiceFile)
+      reset()
       onClose()
     } catch (error) {
       console.error('Error uploading invoice:', error)
@@ -50,37 +59,49 @@ export function UploadInvoicePurchaseRequestModal({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          reset()
+          onClose()
+        }
+      }}
+    >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Upload Invoice</DialogTitle>
+          <DialogTitle>Upload Nota Fiscal</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="invoice-number">Invoice Number</Label>
-            <Input
-              id="invoice-number"
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-              placeholder="Enter invoice number"
-              required
+            <Label htmlFor="invoice-file">Nota fiscal</Label>
+            <Controller
+              name="invoiceFile"
+              control={control}
+              render={({ field: { onChange, value, ...field } }) => (
+                <Input
+                  id="invoice-file"
+                  type="file"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      onChange(file)
+                    }
+                  }}
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  {...field}
+                />
+              )}
             />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="invoice-file">Invoice File</Label>
-            <Input
-              id="invoice-file"
-              type="file"
-              onChange={handleFileChange}
-              accept=".pdf,.jpg,.jpeg,.png"
-              required
-            />
+            {errors.invoiceFile && (
+              <p className="text-sm text-red-500">{errors.invoiceFile.message}</p>
+            )}
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting || !file || !invoiceNumber}>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Uploading...' : 'Upload'}
               <Upload className="ml-2 h-4 w-4" />
             </Button>

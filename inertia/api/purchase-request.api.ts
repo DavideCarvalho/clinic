@@ -1,6 +1,4 @@
 import PurchaseRequest from '#models/purchase_request'
-import { clinicReceivedPurchaseRequestValidator } from '#validators/purchase_request'
-import { Infer } from '@vinejs/vine/types'
 import { BackendModel } from './utils/backend-model.dto'
 import { fileToBase64 } from '~/lib/file-to-base64'
 
@@ -56,6 +54,27 @@ export function newPurchaseRequest(data: NewPurchaseRequestBody): Promise<void> 
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
+  }).then((res) => {
+    if (!res.ok) throw new Error(res.statusText)
+  })
+}
+
+interface ClinicUploadInvoiceParams {
+  purchaseRequestId: string
+  body: {
+    invoice: File
+  }
+}
+
+export async function clinicUploadInvoice(data: ClinicUploadInvoiceParams): Promise<void> {
+  return fetch(`/api/v1/purchase-requests/${data.purchaseRequestId}/clinic/upload-invoice`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      invoice: await fileToBase64(data.body.invoice),
+    }),
   }).then((res) => {
     if (!res.ok) throw new Error(res.statusText)
   })

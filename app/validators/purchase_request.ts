@@ -18,6 +18,15 @@ export const clinicReceivedPurchaseRequestValidator = vine.compile(
   })
 )
 
+export const clinicUploadInvoiceValidator = vine.compile(
+  vine.object({
+    params: vine.object({
+      purchaseRequestId: vine.string(),
+    }),
+    invoice: vine.string().minLength(1),
+  })
+)
+
 export const newPurchaseRequestValidator = vine.compile(
   vine.object({
     supplier: vine.string().minLength(1).trim(),

@@ -97,6 +97,10 @@ router
           ':purchaseRequestId/clinic/received',
           '#controllers/purchase_requests_controller.clinicReceivedPurchaseRequest'
         )
+        router.post(
+          ':purchaseRequestId/clinic/upload-invoice',
+          '#controllers/purchase_requests_controller.clinicUploadInvoice'
+        )
       })
       .prefix('/v1/purchase-requests')
       .use(middleware.auth())

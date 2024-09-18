@@ -2,6 +2,7 @@ import PurchaseRequest from '#models/purchase_request'
 import PurchaseRequestItem from '#models/purchase_request_item'
 import {
   clinicReceivedPurchaseRequestValidator as clinicReceivedPurchaseRequestValidator,
+  clinicUploadInvoiceValidator,
   newPurchaseRequestValidator,
 } from '#validators/purchase_request'
 import drive from '@adonisjs/drive/services/main'
@@ -66,6 +67,27 @@ export default class PurchaseRequestsController {
         })
     })
     return PurchaseRequest.findBy('id', purchaseRequestId)
+  }
+
+  public async clinicUploadInvoice({ request, auth }: HttpContext) {
+    const clinic = auth.user!.clinic
+    const payload = await request.validateUsing(clinicUploadInvoiceValidator)
+    const purchaseRequest = await PurchaseRequest.query()
+      .where('id', payload.params.purchaseRequestId)
+      .andWhere('clinicId', clinic.id)
+      .first()
+    if (!purchaseRequest) throw new Error('Purchase request not found')
+    if (purchaseRequest.status !== 'WAITING_SUPPLIER_INVOICE') throw new Error('Invalid status')
+    const disk = drive.use()
+    const buffer = Buffer.from(payload.invoice, 'base64')
+    const type = await fileTypeFromBuffer(buffer)
+    const filePath = `/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`
+    purchaseRequest.invoiceFilePath = filePath
+    await disk.put(filePath, payload.invoice, {
+      visibility: 'private',
+    })
+    await purchaseRequest.save()
+    return PurchaseRequest.findBy('id', purchaseRequest.id)
   }
 
   public async clinicReceivedPurchaseRequest({ request, auth }: HttpContext) {

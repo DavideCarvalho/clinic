@@ -20,6 +20,7 @@ import {
   GetClinicPurchaseRequestsResponse,
   clinicReceivedPurchaseRequest,
   newPurchaseRequest,
+  clinicUploadInvoice,
 } from '~/api/purchase-request.api'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -44,8 +45,13 @@ export default function OrdemsDeCompraPage() {
     queryKey: ['purchase-requests', 'clinic'],
     queryFn: () => getClinicPurchaseRequests(),
   })
+
   const newPurchaseRequestMutation = useMutation({
     mutationFn: newPurchaseRequest,
+  })
+
+  const clinicUploadInvoiceMutation = useMutation({
+    mutationFn: clinicUploadInvoice,
   })
 
   const clinicReceivedPurchaseRequestMutation = useMutation({
@@ -70,6 +76,11 @@ export default function OrdemsDeCompraPage() {
     } finally {
       queryClient.invalidateQueries()
     }
+  }
+
+  function handleOpenUploadInvoiceModal(purchaseRequest: GetClinicPurchaseRequestsResponse[0]) {
+    setSelectedPurchaseRequest(purchaseRequest)
+    setIsUploadInvoiceModalOpen(true)
   }
 
   const columns: Column<GetClinicPurchaseRequestsResponse[0]>[] = [
@@ -109,7 +120,7 @@ export default function OrdemsDeCompraPage() {
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => handleCancelPurchaseRequest(row.original)}
+                  onClick={() => handleOpenUploadInvoiceModal(row.original)}
                 >
                   <Receipt className="mr-2 h-4 w-4" />
                   Nota fiscal
@@ -176,13 +187,26 @@ export default function OrdemsDeCompraPage() {
     setIsCancelPurchaseRequestModalOpen(true)
   }
 
-  async function handleUploadInvoiceSubmit({
-    file,
-    invoiceNumber,
-  }: {
-    file: File
-    invoiceNumber: string
-  }) {}
+  async function handleUploadInvoiceSubmit(invoice: File) {
+    if (!selectedPurchaseRequest) return
+    const toastId = toast.loading('Enviando nota fiscal...')
+    try {
+      await clinicUploadInvoiceMutation.mutateAsync({
+        purchaseRequestId: selectedPurchaseRequest.id,
+        body: {
+          invoice,
+        },
+      })
+      toast.dismiss(toastId)
+      toast.success('Nota fiscal enviada com sucesso!')
+      setIsUploadInvoiceModalOpen(false)
+      setSelectedPurchaseRequest(null)
+      queryClient.invalidateQueries()
+    } catch (e) {
+      toast.dismiss(toastId)
+      toast.error('Erro ao enviar nota fiscal!')
+    }
+  }
 
   const renderSubComponent = ({ row }: { row: GetClinicPurchaseRequestsResponse[0] }) => (
     <Table>
