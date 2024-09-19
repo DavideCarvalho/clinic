@@ -14,7 +14,7 @@ export function getClinicPurchaseRequests(): Promise<GetClinicPurchaseRequestsRe
 interface ClinicReceivedPurchaseRequestBody {
   purchaseRequestId: string
   arrivalDate: Date
-  invoice: File
+  invoice?: File
   items: {
     itemId: string
     askedQuantity: number
@@ -32,7 +32,7 @@ export async function clinicReceivedPurchaseRequest(
     },
     body: JSON.stringify({
       ...data,
-      invoice: await fileToBase64(data.invoice),
+      invoice: data.invoice ? await fileToBase64(data.invoice) : undefined,
     }),
   }).then((res) => {
     if (!res.ok) throw new Error(res.statusText)
@@ -75,6 +75,23 @@ export async function clinicUploadInvoice(data: ClinicUploadInvoiceParams): Prom
     body: JSON.stringify({
       invoice: await fileToBase64(data.body.invoice),
     }),
+  }).then((res) => {
+    if (!res.ok) throw new Error(res.statusText)
+  })
+}
+
+interface ClinicDeletePurchaseRequestParams {
+  purchaseRequestId: string
+}
+
+export async function clinicDeletePurchaseRequest(
+  data: ClinicDeletePurchaseRequestParams
+): Promise<void> {
+  return fetch(`/api/v1/purchase-requests/${data.purchaseRequestId}/clinic`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   }).then((res) => {
     if (!res.ok) throw new Error(res.statusText)
   })

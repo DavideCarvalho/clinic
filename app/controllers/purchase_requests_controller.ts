@@ -1,6 +1,7 @@
 import PurchaseRequest from '#models/purchase_request'
 import PurchaseRequestItem from '#models/purchase_request_item'
 import {
+  clinicDeletePurchaseRequestValidator,
   clinicReceivedPurchaseRequestValidator as clinicReceivedPurchaseRequestValidator,
   clinicUploadInvoiceValidator,
   newPurchaseRequestValidator,
@@ -129,5 +130,21 @@ export default class PurchaseRequestsController {
       purchaseRequest.receivedAt = payload.arrivalDate
       await purchaseRequest.save()
     })
+  }
+
+  public async clinicDeletePurchaseRequest({ request, auth }: HttpContext) {
+    const clinic = auth.user!.clinic
+    const payload = await request.validateUsing(clinicDeletePurchaseRequestValidator)
+    const purchaseRequest = await PurchaseRequest.findBy('id', payload.params.purchaseRequestId)
+    if (!purchaseRequest) throw new Error('Purchase request not found')
+    if (purchaseRequest.status !== 'WAITING_SUPPLIER_INVOICE') throw new Error('Invalid status')
+    await PurchaseRequestItem.query()
+      .where('purchaseRequestId', payload.params.purchaseRequestId)
+      .delete()
+    await PurchaseRequest.query()
+      .where('id', payload.params.purchaseRequestId)
+      .andWhere('clinicId', clinic.id)
+      .andWhere('status', 'WAITING_SUPPLIER_INVOICE')
+      .delete()
   }
 }

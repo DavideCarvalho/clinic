@@ -101,6 +101,10 @@ router
           ':purchaseRequestId/clinic/upload-invoice',
           '#controllers/purchase_requests_controller.clinicUploadInvoice'
         )
+        router.delete(
+          ':purchaseRequestId/clinic',
+          '#controllers/purchase_requests_controller.clinicDeletePurchaseRequest'
+        )
       })
       .prefix('/v1/purchase-requests')
       .use(middleware.auth())

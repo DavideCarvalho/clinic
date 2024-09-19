@@ -21,6 +21,7 @@ import {
   clinicReceivedPurchaseRequest,
   newPurchaseRequest,
   clinicUploadInvoice,
+  clinicDeletePurchaseRequest,
 } from '~/api/purchase-request.api'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -31,6 +32,7 @@ import {
   NewPurchaseRequestModal,
 } from '~/components/purchase-request/new-purchase-request-modal'
 import { UploadInvoicePurchaseRequestModal } from '~/components/purchase-request/upload-invoice-purchase-request-modal'
+import { ConfirmDeletionModal } from '~/components/common/confirm-deletion-modal'
 
 export default function OrdemsDeCompraPage() {
   const queryClient = getQueryClient()
@@ -52,6 +54,10 @@ export default function OrdemsDeCompraPage() {
 
   const clinicUploadInvoiceMutation = useMutation({
     mutationFn: clinicUploadInvoice,
+  })
+
+  const clinicDeletePurchaseRequestMutation = useMutation({
+    mutationFn: clinicDeletePurchaseRequest,
   })
 
   const clinicReceivedPurchaseRequestMutation = useMutation({
@@ -131,7 +137,7 @@ export default function OrdemsDeCompraPage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleCancelPurchaseRequest(row.original)}
+                    onClick={() => handleConfirmCancelPurchaseRequest(row.original)}
                   >
                     <FileSymlink className="mr-2 h-4 w-4" />
                     Ver Nota fiscal
@@ -140,7 +146,7 @@ export default function OrdemsDeCompraPage() {
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => handleCancelPurchaseRequest(row.original)}
+                  onClick={() => handleConfirmCancelPurchaseRequest(row.original)}
                 >
                   <XIcon className="mr-2 h-4 w-4" />
                   Cancelar
@@ -180,11 +186,12 @@ export default function OrdemsDeCompraPage() {
       })
       toast.dismiss(toastId)
       toast.success('Chegada registrada com sucesso!')
-      queryClient.invalidateQueries()
     } catch (e) {
       console.log('Erro ao registrar chegada', e)
       toast.dismiss(toastId)
       toast.error('Erro ao registrar chegada!')
+    } finally {
+      queryClient.invalidateQueries()
     }
     setIsArrivalModallOpen(false)
   }
@@ -194,9 +201,30 @@ export default function OrdemsDeCompraPage() {
     setIsArrivalModallOpen(true)
   }
 
-  function handleCancelPurchaseRequest(purchaseRequest: GetClinicPurchaseRequestsResponse[0]) {
+  function handleConfirmCancelPurchaseRequest(
+    purchaseRequest: GetClinicPurchaseRequestsResponse[0]
+  ) {
     setSelectedPurchaseRequest(purchaseRequest)
     setIsCancelPurchaseRequestModalOpen(true)
+  }
+
+  async function handleConfirmDeletion() {
+    if (!selectedPurchaseRequest) return
+    const toastId = toast.loading('Deletando solicitação de compra...')
+    try {
+      await clinicDeletePurchaseRequestMutation.mutateAsync({
+        purchaseRequestId: selectedPurchaseRequest.id,
+      })
+      toast.dismiss(toastId)
+      toast.success('Solicitação de compra deletada com sucesso!')
+      setSelectedPurchaseRequest(null)
+      setIsCancelPurchaseRequestModalOpen(false)
+    } catch (e) {
+      toast.dismiss(toastId)
+      toast.error('Erro ao deletar solicitação de compra!')
+    } finally {
+      queryClient.invalidateQueries()
+    }
   }
 
   async function handleUploadInvoiceSubmit(invoice: File) {
@@ -273,6 +301,13 @@ export default function OrdemsDeCompraPage() {
         isOpen={isNewPurchaseRequestModalOpen}
         onClose={() => setIsNewPurchaseRequestModalOpen(false)}
         onSubmit={handleNewPurchaseRequest}
+      />
+      <ConfirmDeletionModal
+        isOpen={isCancelPurchaseRequestModalOpen}
+        onClose={() => setIsCancelPurchaseRequestModalOpen(false)}
+        onConfirm={handleConfirmDeletion}
+        title="Deletar Solicitação de Compra"
+        description="Você tem certeza que deseja deletar esta solicitação de compra?"
       />
     </div>
   )
