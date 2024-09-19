@@ -46,3 +46,11 @@ export const clinicDeletePurchaseRequestValidator = vine.compile(
     }),
   })
 )
+
+export const getInvoiceSignedUrlValidator = vine.compile(
+  vine.object({
+    params: vine.object({
+      purchaseRequestId: vine.string(),
+    }),
+  })
+)

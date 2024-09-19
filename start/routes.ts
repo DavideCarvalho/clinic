@@ -105,6 +105,10 @@ router
           ':purchaseRequestId/clinic',
           '#controllers/purchase_requests_controller.clinicDeletePurchaseRequest'
         )
+        router.get(
+          ':purchaseRequestId/clinic/invoice-signed-url',
+          '#controllers/purchase_requests_controller.getInvoiceSignedUrl'
+        )
       })
       .prefix('/v1/purchase-requests')
       .use(middleware.auth())

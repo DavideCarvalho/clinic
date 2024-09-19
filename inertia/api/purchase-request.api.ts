@@ -96,3 +96,22 @@ export async function clinicDeletePurchaseRequest(
     if (!res.ok) throw new Error(res.statusText)
   })
 }
+
+export interface GetInvoiceSignedUrlResponse {
+  signedUrl: string
+}
+
+export interface GetInvoiceSignedUrlParams {
+  purchaseRequestId: string
+}
+
+export function getInvoiceSignedUrl(
+  data: GetInvoiceSignedUrlParams
+): Promise<GetInvoiceSignedUrlResponse> {
+  return fetch(
+    `/api/v1/purchase-requests/${data.purchaseRequestId}/clinic/invoice-signed-url`
+  ).then((res) => {
+    if (!res.ok) throw new Error(res.statusText)
+    return res.json()
+  })
+}

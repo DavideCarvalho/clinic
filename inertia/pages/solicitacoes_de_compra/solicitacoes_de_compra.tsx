@@ -22,6 +22,7 @@ import {
   newPurchaseRequest,
   clinicUploadInvoice,
   clinicDeletePurchaseRequest,
+  getInvoiceSignedUrl,
 } from '~/api/purchase-request.api'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { format } from 'date-fns'
@@ -89,6 +90,17 @@ export default function OrdemsDeCompraPage() {
     setIsUploadInvoiceModalOpen(true)
   }
 
+  async function handleOpenInvoice(purchaseRequest: GetClinicPurchaseRequestsResponse[0]) {
+    try {
+      const { signedUrl } = await getInvoiceSignedUrl({
+        purchaseRequestId: purchaseRequest.id,
+      })
+      window.open(signedUrl, '_blank')
+    } catch (e) {
+      toast.error('Erro ao abrir nota fiscal!')
+    }
+  }
+
   const columns: Column<GetClinicPurchaseRequestsResponse[0]>[] = [
     { header: 'Quantidade de itens', accessorFn: (row) => row.purchaseRequestItems.length },
     {
@@ -137,7 +149,7 @@ export default function OrdemsDeCompraPage() {
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleConfirmCancelPurchaseRequest(row.original)}
+                    onClick={() => handleOpenInvoice(row.original)}
                   >
                     <FileSymlink className="mr-2 h-4 w-4" />
                     Ver Nota fiscal

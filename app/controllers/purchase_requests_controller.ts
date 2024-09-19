@@ -4,6 +4,7 @@ import {
   clinicDeletePurchaseRequestValidator,
   clinicReceivedPurchaseRequestValidator as clinicReceivedPurchaseRequestValidator,
   clinicUploadInvoiceValidator,
+  getInvoiceSignedUrlValidator,
   newPurchaseRequestValidator,
 } from '#validators/purchase_request'
 import drive from '@adonisjs/drive/services/main'
@@ -80,13 +81,18 @@ export default class PurchaseRequestsController {
     if (!purchaseRequest) throw new Error('Purchase request not found')
     if (purchaseRequest.status !== 'WAITING_SUPPLIER_INVOICE') throw new Error('Invalid status')
     const disk = drive.use()
-    const buffer = Buffer.from(payload.invoice, 'base64')
+    let cleanedBase64Invoice = payload.invoice.split(',')[1]
+    const buffer = Buffer.from(cleanedBase64Invoice, 'base64')
     const type = await fileTypeFromBuffer(buffer)
-    const filePath = `/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`
+    const extension = type?.ext ?? 'pdf'
+    const filePath = `${clinic.id}/purchase_requests/${payload.params.purchaseRequestId}/invoice.${extension}`
     purchaseRequest.invoiceFilePath = filePath
-    await disk.put(filePath, payload.invoice, {
+    await disk.put(filePath, buffer, {
       visibility: 'private',
+      contentEncoding: 'base64',
+      contentType: type?.mime ?? 'application/pdf',
     })
+    purchaseRequest.status = 'WAITING_ARRIVAL'
     await purchaseRequest.save()
     return PurchaseRequest.findBy('id', purchaseRequest.id)
   }
@@ -102,19 +108,18 @@ export default class PurchaseRequestsController {
         .first()
       if (!purchaseRequest) throw new Error('Purchase request not found')
       if (payload.invoice) {
-        const buffer = Buffer.from(payload.invoice, 'base64')
+        let cleanedBase64Invoice = payload.invoice.split(',')[1]
+        const buffer = Buffer.from(cleanedBase64Invoice, 'base64')
         const type = await fileTypeFromBuffer(buffer)
         const disk = drive.use()
-        try {
-          const filePath = `/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`
-          await disk.put(filePath, payload.invoice, {
-            visibility: 'private',
-          })
-          purchaseRequest.invoiceFilePath = `/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`
-        } catch (e) {
-          console.log('Erro ao enviar arquivo', JSON.stringify(e))
-          throw e
-        }
+        const extension = type?.ext ?? 'pdf'
+        const filePath = `${clinic.id}/purchase_requests/${payload.params.purchaseRequestId}/invoice.${extension}`
+        await disk.put(filePath, buffer, {
+          visibility: 'private',
+          contentEncoding: 'base64',
+          contentType: type?.mime ?? 'application/pdf',
+        })
+        purchaseRequest.invoiceFilePath = `/purchase_requests/${payload.params.purchaseRequestId}/invoice.${type?.ext ?? 'pdf'}`
       }
       for (const item of payload.items) {
         const purchaseRequestItem = await PurchaseRequestItem.query({ client: trx })
@@ -146,5 +151,22 @@ export default class PurchaseRequestsController {
       .andWhere('clinicId', clinic.id)
       .andWhere('status', 'WAITING_SUPPLIER_INVOICE')
       .delete()
+  }
+
+  public async getInvoiceSignedUrl({ request, auth }: HttpContext) {
+    const disk = drive.use()
+    const clinic = auth.user!.clinic
+    const payload = await request.validateUsing(getInvoiceSignedUrlValidator)
+    const purchaseRequest = await PurchaseRequest.query()
+      .where('id', payload.params.purchaseRequestId)
+      .andWhere('clinicId', clinic.id)
+      .andWhere('status', 'WAITING_SUPPLIER_INVOICE')
+      .first()
+    if (!purchaseRequest) throw new Error('Purchase request not found')
+    if (!purchaseRequest.invoiceFilePath) throw new Error('Invoice not found')
+    const signedUrl = await disk.getSignedUrl(purchaseRequest.invoiceFilePath)
+    return {
+      signedUrl,
+    }
   }
 }
