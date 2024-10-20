@@ -12,9 +12,14 @@ import { AlertTriangle, DollarSign, Package } from 'lucide-react'
 import { ClinicLayout } from '~/layouts/clinic_layout'
 import { formatCurrency } from '~/lib/format-currency'
 import { Head } from '@inertiajs/react'
+import type { HomePageProps } from '#controllers/inertia/home_controller'
 
-export default function HomePage({ inventoryQuantity, inventoryValue, itemsNeedingReplacement }) {
-  const value = inventoryValue ? inventoryValue?.inventoryValue / 100 : 0
+export default function HomePage({
+  inventoryQuantity,
+  inventoryValue,
+  itemsNeedingReplacement,
+}: HomePageProps) {
+  const value = inventoryValue ? inventoryValue / 100 : 0
   return (
     <>
       <Head>
@@ -42,7 +47,7 @@ export default function HomePage({ inventoryQuantity, inventoryValue, itemsNeedi
               <AlertTriangle className="h-4 w-4 text-yellow-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{itemsNeedingReplacement?.meta?.total}</div>
+              <div className="text-2xl font-bold">{itemsNeedingReplacement.meta.total}</div>
               <p className="text-xs text-muted-foreground">Precisam de reabastecimento</p>
             </CardContent>
           </Card>
@@ -118,7 +123,7 @@ export default function HomePage({ inventoryQuantity, inventoryValue, itemsNeedi
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {itemsNeedingReplacement.data.data.map((item) => (
+                {itemsNeedingReplacement.data.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.itemCategory.name}</TableCell>
