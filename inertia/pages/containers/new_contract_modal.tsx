@@ -24,6 +24,7 @@ import { Label } from '~/lib/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '~/lib/components/ui/popover'
 import { toast } from 'sonner'
 import { router } from '@inertiajs/react'
+import { tuyau } from '~/api/tuyau-client'
 
 const schema = z.object({
   clientEmail: z
@@ -45,36 +46,11 @@ export function NewContractModal({ isOpen, onSubmit, onClose }: NewContractModal
     resolver: zodResolver(schema),
   })
 
-  // const { mutateAsync: createContract } = useMutation({
-  //   mutationFn: async ({ startDate, endDate, clientEmail, files }: z.infer<typeof schema>) => {
-  //     const filesInBase64: string[] = []
-  //     for (const file of files) {
-  //       filesInBase64.push(await getBase64(file))
-  //     }
-  //     return fetch('/api/v1/contracts', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         startDate: DateTime.fromJSDate(startDate),
-  //         endDate: DateTime.fromJSDate(endDate),
-  //         description: '',
-  //         clientEmail,
-  //         files: filesInBase64,
-  //       }),
-  //     }).then((res) => {
-  //       if (!res.ok) throw new Error(res.statusText)
-  //       return res.json()
-  //     })
-  //   },
-  // })
-
   function getBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.readAsDataURL(file)
-      reader.onload = () => resolve(reader.result)
+      reader.onload = () => resolve(reader.result as string)
       reader.onerror = reject
     })
   }
@@ -85,12 +61,18 @@ export function NewContractModal({ isOpen, onSubmit, onClose }: NewContractModal
   async function onSubmitForm(data: z.infer<typeof schema>) {
     toast.loading('Criando contrato...')
     try {
-      // await createContract({
-      //   startDate: data.startDate,
-      //   endDate: data.endDate,
-      //   clientEmail: data.clientEmail,
-      //   files: data.files,
-      // })
+      const filesInBase64: string[] = []
+      for (const file of data.files) {
+        filesInBase64.push(await getBase64(file))
+      }
+      await tuyau.api.v1.contracts
+        .$post({
+          startDate: data.startDate.toISOString(),
+          endDate: data.endDate.toISOString(),
+          clientEmail: data.clientEmail,
+          files: filesInBase64,
+        })
+        .unwrap()
       toast.dismiss()
       toast.success('Contrato criado com sucesso!')
       onSubmit()

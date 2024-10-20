@@ -10,15 +10,15 @@ import type { HttpContext } from '@adonisjs/core/http'
 export default class ContractsController {
   constructor(private readonly contractsService: ContractsService) {}
 
-  async getAll(ctx: HttpContext) {
+  async getAll() {
     return Contract.query().preload('clinic')
   }
 
   async createContract(ctx: HttpContext) {
+    const payload = await ctx.request.validateUsing(createContractValidator)
     if (!ctx.auth.user) throw new Error('Unauthorized')
     await ctx.auth.user.load('clinic')
     const clinic = ctx.auth.user.clinic
-    const payload = await ctx.request.validateUsing(createContractValidator)
     let client = await User.query().where('email', payload.clientEmail).first()
     if (!client) {
       client = await User.create({

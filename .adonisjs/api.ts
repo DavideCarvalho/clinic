@@ -101,6 +101,18 @@ type ApiUsersPost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/user.ts')['createUserValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/users_controller.ts').default['createUser']>
 }
+type InventarioGetHead = {
+  request: unknown
+  response: MakeTuyauResponse<import('../app/controllers/inertia/inventory_controller.ts').default['handle']>
+}
+type InventarioNovoitemGetHead = {
+  request: unknown
+  response: MakeTuyauResponse<import('../app/controllers/inertia/add_inventory_item_controller.ts').default['handle']>
+}
+type SolicitacoesDeCompraGetHead = {
+  request: unknown
+  response: MakeTuyauResponse<import('../app/controllers/inertia/purchase_requests_controller.ts').default['handle']>
+}
 export interface ApiDefinition {
   'api': {
     'v1': {
@@ -248,52 +260,242 @@ export interface ApiDefinition {
       '$post': ApiUsersPost;
     };
   };
+  'inventario': {
+    '$url': {
+    };
+    '$get': InventarioGetHead;
+    '$head': InventarioGetHead;
+    'novo-item': {
+      '$url': {
+      };
+      '$get': InventarioNovoitemGetHead;
+      '$head': InventarioNovoitemGetHead;
+    };
+  };
+  'solicitacoes-de-compra': {
+    '$url': {
+    };
+    '$get': SolicitacoesDeCompraGetHead;
+    '$head': SolicitacoesDeCompraGetHead;
+  };
 }
 const routes = [
   {
     params: [],
-    name: 'purchaseRequests.getClinicPurchaseRequests',
+    name: 'api.v1.contracts.getContracts',
+    path: '/api/v1/contracts',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1ContractsGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.contracts.createContract',
+    path: '/api/v1/contracts',
+    method: ["POST"],
+    types: {} as ApiV1ContractsPost,
+  },
+  {
+    params: [],
+    name: 'api.v1.contracts.getContractsCreatedInLast12Months',
+    path: '/api/v1/contracts/created-in-last-12-months',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1ContractsCreatedinlast12monthsGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.contracts.getContractsQuantityEndingIn30Days',
+    path: '/api/v1/contracts/ending-in-30-days/count',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1ContractsEndingin30daysCountGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.contracts.getActiveContractsQuantity',
+    path: '/api/v1/contracts/active/count',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1ContractsActiveCountGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.createItem',
+    path: '/api/v1/inventory/clinic/items',
+    method: ["POST"],
+    types: {} as ApiV1InventoryClinicItemsPost,
+  },
+  {
+    params: ["id"],
+    name: 'api.v1.inventory.increaseItemQuantity',
+    path: '/api/v1/inventory/clinic/items/:id/add',
+    method: ["POST"],
+    types: {} as ApiV1InventoryClinicItemsIdAddPost,
+  },
+  {
+    params: ["id"],
+    name: 'api.v1.inventory.decreaseItemQuantity',
+    path: '/api/v1/inventory/clinic/items/:id/withdraw',
+    method: ["POST"],
+    types: {} as ApiV1InventoryClinicItemsIdWithdrawPost,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.moreUtilizedItems',
+    path: '/api/v1/inventory/clinic/items/more-utilized',
+    method: ["POST"],
+    types: {} as ApiV1InventoryClinicItemsMoreutilizedPost,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.itemsNeedingReplacement',
+    path: '/api/v1/inventory/clinic/items/needing-replacement',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1InventoryClinicItemsNeedingreplacementGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.inventoryValue',
+    path: '/api/v1/inventory/clinic/inventory-value',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1InventoryClinicInventoryvalueGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.inventoryQuantity',
+    path: '/api/v1/inventory/clinic/inventory-quantity',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1InventoryClinicInventoryquantityGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.getClinicItems',
+    path: '/api/v1/inventory/clinic/items',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1InventoryClinicItemsGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.getItemsWithMostTransactionsWithinLast12Months',
+    path: '/api/v1/inventory/clinic/items/most-used',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1InventoryClinicItemsMostusedGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.inventory.getCategories',
+    path: '/api/v1/inventory/clinic/items/categories',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1InventoryClinicItemsCategoriesGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.purchaseRequests.getClinicPurchaseRequests',
     path: '/api/v1/purchase-requests/clinic',
     method: ["GET","HEAD"],
     types: {} as ApiV1PurchaserequestsClinicGetHead,
   },
   {
     params: [],
-    name: 'purchaseRequests.newPurchaseRequest',
+    name: 'api.v1.purchaseRequests.newPurchaseRequest',
     path: '/api/v1/purchase-requests/clinic',
     method: ["POST"],
     types: {} as ApiV1PurchaserequestsClinicPost,
   },
   {
     params: ["purchaseRequestId"],
-    name: 'purchaseRequests.clinicReceivedPurchaseRequest',
+    name: 'api.v1.purchaseRequests.clinicReceivedPurchaseRequest',
     path: '/api/v1/purchase-requests/:purchaseRequestId/clinic/received',
     method: ["POST"],
     types: {} as ApiV1PurchaserequestsIdClinicReceivedPost,
   },
   {
     params: ["purchaseRequestId"],
-    name: 'purchaseRequests.clinicUploadInvoice',
+    name: 'api.v1.purchaseRequests.clinicUploadInvoice',
     path: '/api/v1/purchase-requests/:purchaseRequestId/clinic/upload-invoice',
     method: ["POST"],
     types: {} as ApiV1PurchaserequestsIdClinicUploadinvoicePost,
   },
   {
     params: ["purchaseRequestId"],
-    name: 'purchaseRequests.clinicDeletePurchaseRequest',
+    name: 'api.v1.purchaseRequests.clinicDeletePurchaseRequest',
     path: '/api/v1/purchase-requests/:purchaseRequestId/clinic',
     method: ["DELETE"],
     types: {} as ApiV1PurchaserequestsIdClinicDelete,
   },
   {
     params: ["purchaseRequestId"],
-    name: 'purchaseRequests.getInvoiceSignedUrl',
+    name: 'api.v1.purchaseRequests.getInvoiceSignedUrl',
     path: '/api/v1/purchase-requests/:purchaseRequestId/clinic/invoice-signed-url',
     method: ["GET","HEAD"],
     types: {} as ApiV1PurchaserequestsIdClinicInvoicesignedurlGetHead,
+  },
+  {
+    params: [],
+    name: 'api.v1.itemSuppliers.getClinicSuppliers',
+    path: '/api/v1/item-suppliers/clinic',
+    method: ["GET","HEAD"],
+    types: {} as ApiV1ItemsuppliersClinicGetHead,
+  },
+  {
+    params: [],
+    name: 'api.login',
+    path: '/api/login',
+    method: ["POST"],
+    types: {} as ApiLoginPost,
+  },
+  {
+    params: [],
+    name: 'api.logout',
+    path: '/api/logout',
+    method: ["POST"],
+    types: {} as ApiLogoutPost,
+  },
+  {
+    params: [],
+    name: 'api.users.createUser',
+    path: '/api/users',
+    method: ["POST"],
+    types: {} as ApiUsersPost,
+  },
+  {
+    params: [],
+    name: 'home',
+    path: '/',
+    method: ["GET","HEAD"],
+    types: {} as unknown,
+  },
+  {
+    params: [],
+    name: 'inventory',
+    path: '/inventario',
+    method: ["GET","HEAD"],
+    types: {} as InventarioGetHead,
+  },
+  {
+    params: [],
+    name: 'addInventoryItem',
+    path: '/inventario/novo-item',
+    method: ["GET","HEAD"],
+    types: {} as InventarioNovoitemGetHead,
+  },
+  {
+    params: [],
+    name: 'purchaseRequests',
+    path: '/solicitacoes-de-compra',
+    method: ["GET","HEAD"],
+    types: {} as SolicitacoesDeCompraGetHead,
+  },
+  {
+    params: [],
+    name: 'forgotPassword',
+    path: '/esqueci-minha-senha',
+    method: ["GET","HEAD"],
+    types: {} as unknown,
   },
 ] as const;
 export const api = {
   routes,
   definition: {} as ApiDefinition
+}
+declare module '@tuyau/inertia/types' {
+  type InertiaApi = typeof api
+  export interface Api extends InertiaApi {}
 }

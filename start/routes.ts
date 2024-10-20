@@ -35,25 +35,23 @@ router
       .group(() => {
         router
           .get('/', '#controllers/contracts_controller.getContractsPaginated')
-          .as('api.v1.contracts.getContracts')
-        router
-          .post('/', '#controllers/contracts_controller.createContract')
-          .as('api.v1.contracts.createContract')
+          .as('getContracts')
+        router.post('/', '#controllers/contracts_controller.createContract').as('createContract')
         router
           .get(
             '/created-in-last-12-months',
             '#controllers/contracts_controller.getContractsCreatedInLast12Months'
           )
-          .as('api.v1.contracts.getContractsCreatedInLast12Months')
+          .as('getContractsCreatedInLast12Months')
         router
           .get(
             '/ending-in-30-days/count',
             '#controllers/contracts_controller.getContractsQuantityEndingIn30Days'
           )
-          .as('api.v1.contracts.getContractsQuantityEndingIn30Days')
+          .as('getContractsQuantityEndingIn30Days')
         router
           .get('/active/count', '#controllers/contracts_controller.getActiveContractsQuantity')
-          .as('api.v1.contracts.getActiveContractsQuantity')
+          .as('getActiveContractsQuantity')
       })
       .prefix('/v1/contracts')
       .use(middleware.auth())
@@ -63,46 +61,46 @@ router
       .group(() => {
         router
           .post('/clinic/items', '#controllers/inventory_controller.createItem')
-          .as('api.v1.inventory.createItem')
+          .as('createItem')
         router
           .post('/clinic/items/:id/add', '#controllers/inventory_controller.increaseItemQuantity')
-          .as('api.v1.inventory.increaseItemQuantity')
+          .as('increaseItemQuantity')
         router
           .post(
             '/clinic/items/:id/withdraw',
             '#controllers/inventory_controller.decreaseItemQuantity'
           )
-          .as('api.v1.inventory.decreaseItemQuantity')
+          .as('decreaseItemQuantity')
         router
           .post(
             '/clinic/items/more-utilized',
             '#controllers/inventory_controller.moreUtilizedItems'
           )
-          .as('api.v1.inventory.moreUtilizedItems')
+          .as('moreUtilizedItems')
         router
           .get(
             '/clinic/items/needing-replacement',
             '#controllers/inventory_controller.itemsNeedingReplacement'
           )
-          .as('api.v1.inventory.itemsNeedingReplacement')
+          .as('itemsNeedingReplacement')
         router
           .get('/clinic/inventory-value', '#controllers/inventory_controller.inventoryValue')
-          .as('api.v1.inventory.inventoryValue')
+          .as('inventoryValue')
         router
           .get('/clinic/inventory-quantity', '#controllers/inventory_controller.inventoryQuantity')
-          .as('api.v1.inventory.inventoryQuantity')
+          .as('inventoryQuantity')
         router
           .get('/clinic/items', '#controllers/inventory_controller.getClinicItems')
-          .as('api.v1.inventory.getClinicItems')
+          .as('getClinicItems')
         router
           .get(
             '/clinic/items/most-used',
             '#controllers/inventory_controller.getItemsWithMostTransactionsWithinLast12Months'
           )
-          .as('api.v1.inventory.getItemsWithMostTransactionsWithinLast12Months')
+          .as('getItemsWithMostTransactionsWithinLast12Months')
         router
           .get('/clinic/items/categories', '#controllers/inventory_controller.getCategories')
-          .as('api.v1.inventory.getCategories')
+          .as('getCategories')
       })
       .prefix('/v1/inventory')
       .use(middleware.auth())
@@ -143,13 +141,13 @@ router
       })
       .prefix('/v1/purchase-requests')
       .use(middleware.auth())
-      .as('purchaseRequests')
+      .as('api.v1.purchaseRequests')
 
     router
       .group(() => {
         router
           .get('/clinic', '#controllers/item_suppliers_controller.getClinicSuppliers')
-          .as('api.v1.itemSuppliers.getClinicSuppliers')
+          .as('getClinicSuppliers')
       })
       .prefix('/v1/item-suppliers')
       .use(middleware.auth())
