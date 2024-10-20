@@ -14,6 +14,19 @@ import SendEmail from '#jobs/send_email'
 import { middleware } from './kernel.js'
 import { throttle } from './limiter.js'
 
+const ApiLoginController = () => import('#controllers/login_controller')
+const ContractsController = () => import('#controllers/contracts_controller')
+const InventoryController = () => import('#controllers/inventory_controller')
+const PurchaseRequestsController = () => import('#controllers/purchase_requests_controller')
+const ItemSuppliersController = () => import('#controllers/item_suppliers_controller')
+const UsersController = () => import('#controllers/users_controller')
+const InertiaHomeController = () => import('#controllers/inertia/home_controller')
+const InertiaInventoryController = () => import('#controllers/inertia/inventory_controller')
+const InertiaAddInventoryItemController = () =>
+  import('#controllers/inertia/add_inventory_item_controller')
+const InertiaPurchaseRequestsController = () =>
+  import('#controllers/inertia/purchase_requests_controller')
+
 mail.setMessenger((mailer) => {
   return {
     async queue(mailMessage, config) {
@@ -31,24 +44,22 @@ router
   .group(() => {
     router
       .group(() => {
+        router.get('/', [ContractsController, 'getContractsPaginated']).as('getContracts')
+        router.post('/', [ContractsController, 'createContract']).as('createContract')
         router
-          .get('/', '#controllers/contracts_controller.getContractsPaginated')
-          .as('getContracts')
-        router.post('/', '#controllers/contracts_controller.createContract').as('createContract')
-        router
-          .get(
-            '/created-in-last-12-months',
-            '#controllers/contracts_controller.getContractsCreatedInLast12Months'
-          )
+          .get('/created-in-last-12-months', [
+            ContractsController,
+            'getContractsCreatedInLast12Months',
+          ])
           .as('getContractsCreatedInLast12Months')
         router
-          .get(
-            '/ending-in-30-days/count',
-            '#controllers/contracts_controller.getContractsQuantityEndingIn30Days'
-          )
+          .get('/ending-in-30-days/count', [
+            ContractsController,
+            'getContractsQuantityEndingIn30Days',
+          ])
           .as('getContractsQuantityEndingIn30Days')
         router
-          .get('/active/count', '#controllers/contracts_controller.getActiveContractsQuantity')
+          .get('/active/count', [ContractsController, 'getActiveContractsQuantity'])
           .as('getActiveContractsQuantity')
       })
       .prefix('/v1/contracts')
@@ -57,47 +68,37 @@ router
 
     router
       .group(() => {
+        router.post('/clinic/items', [InventoryController, 'createItem']).as('createItem')
         router
-          .post('/clinic/items', '#controllers/inventory_controller.createItem')
-          .as('createItem')
-        router
-          .post('/clinic/items/:id/add', '#controllers/inventory_controller.increaseItemQuantity')
+          .post('/clinic/items/:id/add', [InventoryController, 'increaseItemQuantity'])
           .as('increaseItemQuantity')
         router
-          .post(
-            '/clinic/items/:id/withdraw',
-            '#controllers/inventory_controller.decreaseItemQuantity'
-          )
+          .post('/clinic/items/:id/withdraw', [InventoryController, 'decreaseItemQuantity'])
           .as('decreaseItemQuantity')
         router
-          .post(
-            '/clinic/items/more-utilized',
-            '#controllers/inventory_controller.moreUtilizedItems'
-          )
+          .post('/clinic/items/more-utilized', [InventoryController, 'moreUtilizedItems'])
           .as('moreUtilizedItems')
         router
-          .get(
-            '/clinic/items/needing-replacement',
-            '#controllers/inventory_controller.itemsNeedingReplacement'
-          )
+          .get('/clinic/items/needing-replacement', [
+            InventoryController,
+            'itemsNeedingReplacement',
+          ])
           .as('itemsNeedingReplacement')
         router
-          .get('/clinic/inventory-value', '#controllers/inventory_controller.inventoryValue')
+          .get('/clinic/inventory-value', [InventoryController, 'inventoryValue'])
           .as('inventoryValue')
         router
-          .get('/clinic/inventory-quantity', '#controllers/inventory_controller.inventoryQuantity')
+          .get('/clinic/inventory-quantity', [InventoryController, 'inventoryQuantity'])
           .as('inventoryQuantity')
+        router.get('/clinic/items', [InventoryController, 'getClinicItems']).as('getClinicItems')
         router
-          .get('/clinic/items', '#controllers/inventory_controller.getClinicItems')
-          .as('getClinicItems')
-        router
-          .get(
-            '/clinic/items/most-used',
-            '#controllers/inventory_controller.getItemsWithMostTransactionsWithinLast12Months'
-          )
+          .get('/clinic/items/most-used', [
+            InventoryController,
+            'getItemsWithMostTransactionsWithinLast12Months',
+          ])
           .as('getItemsWithMostTransactionsWithinLast12Months')
         router
-          .get('/clinic/items/categories', '#controllers/inventory_controller.getCategories')
+          .get('/clinic/items/categories', [InventoryController, 'getCategories'])
           .as('getCategories')
       })
       .prefix('/v1/inventory')
@@ -107,34 +108,34 @@ router
     router
       .group(() => {
         router
-          .get('/clinic', '#controllers/purchase_requests_controller.getClinicPurchaseRequests')
+          .get('/clinic', [PurchaseRequestsController, 'getClinicPurchaseRequests'])
           .as('getClinicPurchaseRequests')
         router
-          .post('/clinic', '#controllers/purchase_requests_controller.newPurchaseRequest')
+          .post('/clinic', [PurchaseRequestsController, 'newPurchaseRequest'])
           .as('newPurchaseRequest')
         router
-          .post(
-            ':purchaseRequestId/clinic/received',
-            '#controllers/purchase_requests_controller.clinicReceivedPurchaseRequest'
-          )
+          .post(':purchaseRequestId/clinic/received', [
+            PurchaseRequestsController,
+            'clinicReceivedPurchaseRequest',
+          ])
           .as('clinicReceivedPurchaseRequest')
         router
-          .post(
-            ':purchaseRequestId/clinic/upload-invoice',
-            '#controllers/purchase_requests_controller.clinicUploadInvoice'
-          )
+          .post(':purchaseRequestId/clinic/upload-invoice', [
+            PurchaseRequestsController,
+            'clinicUploadInvoice',
+          ])
           .as('clinicUploadInvoice')
         router
-          .delete(
-            ':purchaseRequestId/clinic',
-            '#controllers/purchase_requests_controller.clinicDeletePurchaseRequest'
-          )
+          .delete(':purchaseRequestId/clinic', [
+            PurchaseRequestsController,
+            'clinicDeletePurchaseRequest',
+          ])
           .as('clinicDeletePurchaseRequest')
         router
-          .get(
-            ':purchaseRequestId/clinic/invoice-signed-url',
-            '#controllers/purchase_requests_controller.getInvoiceSignedUrl'
-          )
+          .get(':purchaseRequestId/clinic/invoice-signed-url', [
+            PurchaseRequestsController,
+            'getInvoiceSignedUrl',
+          ])
           .as('getInvoiceSignedUrl')
       })
       .prefix('/v1/purchase-requests')
@@ -144,33 +145,30 @@ router
     router
       .group(() => {
         router
-          .get('/clinic', '#controllers/item_suppliers_controller.getClinicSuppliers')
+          .get('/clinic', [ItemSuppliersController, 'getClinicSuppliers'])
           .as('getClinicSuppliers')
       })
       .prefix('/v1/item-suppliers')
       .use(middleware.auth())
       .as('api.v1.itemSuppliers')
 
-    router.post('/login', '#controllers/login_controller.login').as('api.login')
-    router.post('/logout', '#controllers/login_controller.logout').as('api.logout')
-    router.post('/users', '#controllers/users_controller.createUser').as('api.users.createUser')
+    router.post('/login', [ApiLoginController, 'login']).as('api.login')
+    router.post('/logout', [ApiLoginController, 'logout']).as('api.logout')
+    router.post('/users', [UsersController, 'createUser']).as('api.users.createUser')
   })
   .prefix('/api')
 
-router.get('/', '#controllers/inertia/home_controller.handle').use(middleware.auth()).as('home')
+router.get('/', [InertiaHomeController]).use(middleware.auth()).as('home')
+
+router.get('/inventario', [InertiaInventoryController]).use(middleware.auth()).as('inventory')
 
 router
-  .get('/inventario', '#controllers/inertia/inventory_controller.handle')
-  .use(middleware.auth())
-  .as('inventory')
-
-router
-  .get('/inventario/novo-item', '#controllers/inertia/add_inventory_item_controller.handle')
+  .get('/inventario/novo-item', [InertiaAddInventoryItemController, 'handle'])
   .use(middleware.auth())
   .as('addInventoryItem')
 
 router
-  .get('/solicitacoes-de-compra', '#controllers/inertia/purchase_requests_controller.handle')
+  .get('/solicitacoes-de-compra', [InertiaPurchaseRequestsController, 'handle'])
   .use(middleware.auth())
   .as('purchaseRequests')
 
