@@ -9,17 +9,10 @@
 
 import router from '@adonisjs/core/services/router'
 import { middleware } from './kernel.js'
-import { getQueryClient, returnDehydratedState } from '#controllers/utils/return_dehydrated_state'
-import app from '@adonisjs/core/services/app'
-import ContractsService from '#services/contracts.service'
 import AutoSwagger from 'adonis-autoswagger'
 import swagger from '#config/swagger'
-import Item from '#models/item'
-import ItemUnit from '#models/item_unit'
-import ItemCategory from '#models/item_category'
 import transmit from '@adonisjs/transmit/services/main'
 import { throttle } from './limiter.js'
-import PurchaseRequest from '#models/purchase_request'
 import mail from '@adonisjs/mail/services/main'
 import SendEmail from '#jobs/send_email'
 
@@ -40,227 +33,157 @@ router
   .group(() => {
     router
       .group(() => {
-        router.get('/', '#controllers/contracts_controller.getContractsPaginated')
-        router.post('/', '#controllers/contracts_controller.createContract')
-        router.get(
-          '/created-in-last-12-months',
-          '#controllers/contracts_controller.getContractsCreatedInLast12Months'
-        )
-        router.get(
-          '/ending-in-30-days/count',
-          '#controllers/contracts_controller.getContractsQuantityEndingIn30Days'
-        )
-        router.get('/active/count', '#controllers/contracts_controller.getActiveContractsQuantity')
+        router
+          .get('/', '#controllers/contracts_controller.getContractsPaginated')
+          .as('api.v1.contracts.getContracts')
+        router
+          .post('/', '#controllers/contracts_controller.createContract')
+          .as('api.v1.contracts.createContract')
+        router
+          .get(
+            '/created-in-last-12-months',
+            '#controllers/contracts_controller.getContractsCreatedInLast12Months'
+          )
+          .as('api.v1.contracts.getContractsCreatedInLast12Months')
+        router
+          .get(
+            '/ending-in-30-days/count',
+            '#controllers/contracts_controller.getContractsQuantityEndingIn30Days'
+          )
+          .as('api.v1.contracts.getContractsQuantityEndingIn30Days')
+        router
+          .get('/active/count', '#controllers/contracts_controller.getActiveContractsQuantity')
+          .as('api.v1.contracts.getActiveContractsQuantity')
       })
       .prefix('/v1/contracts')
       .use(middleware.auth())
+      .as('api.v1.contracts')
 
     router
       .group(() => {
-        router.post('/clinic/items', '#controllers/inventory_controller.createItem')
-        router.post(
-          '/clinic/items/:id/add',
-          '#controllers/inventory_controller.increaseItemQuantity'
-        )
-        router.post(
-          '/clinic/items/:id/withdraw',
-          '#controllers/inventory_controller.decreaseItemQuantity'
-        )
-        router.post(
-          '/clinic/items/more-utilized',
-          '#controllers/inventory_controller.moreUtilizedItems'
-        )
-        router.get(
-          '/clinic/items/needing-replacement',
-          '#controllers/inventory_controller.itemsNeedingReplacement'
-        )
-        router.get('/clinic/inventory-value', '#controllers/inventory_controller.inventoryValue')
-        router.get(
-          '/clinic/inventory-quantity',
-          '#controllers/inventory_controller.inventoryQuantity'
-        )
-        router.get('/clinic/items', '#controllers/inventory_controller.getClinicItems')
-        router.get(
-          '/clinic/items/most-used',
-          '#controllers/inventory_controller.getItemsWithMostTransactionsWithinLast12Months'
-        )
-        router.get('/clinic/items/categories', '#controllers/inventory_controller.getCategories')
+        router
+          .post('/clinic/items', '#controllers/inventory_controller.createItem')
+          .as('api.v1.inventory.createItem')
+        router
+          .post('/clinic/items/:id/add', '#controllers/inventory_controller.increaseItemQuantity')
+          .as('api.v1.inventory.increaseItemQuantity')
+        router
+          .post(
+            '/clinic/items/:id/withdraw',
+            '#controllers/inventory_controller.decreaseItemQuantity'
+          )
+          .as('api.v1.inventory.decreaseItemQuantity')
+        router
+          .post(
+            '/clinic/items/more-utilized',
+            '#controllers/inventory_controller.moreUtilizedItems'
+          )
+          .as('api.v1.inventory.moreUtilizedItems')
+        router
+          .get(
+            '/clinic/items/needing-replacement',
+            '#controllers/inventory_controller.itemsNeedingReplacement'
+          )
+          .as('api.v1.inventory.itemsNeedingReplacement')
+        router
+          .get('/clinic/inventory-value', '#controllers/inventory_controller.inventoryValue')
+          .as('api.v1.inventory.inventoryValue')
+        router
+          .get('/clinic/inventory-quantity', '#controllers/inventory_controller.inventoryQuantity')
+          .as('api.v1.inventory.inventoryQuantity')
+        router
+          .get('/clinic/items', '#controllers/inventory_controller.getClinicItems')
+          .as('api.v1.inventory.getClinicItems')
+        router
+          .get(
+            '/clinic/items/most-used',
+            '#controllers/inventory_controller.getItemsWithMostTransactionsWithinLast12Months'
+          )
+          .as('api.v1.inventory.getItemsWithMostTransactionsWithinLast12Months')
+        router
+          .get('/clinic/items/categories', '#controllers/inventory_controller.getCategories')
+          .as('api.v1.inventory.getCategories')
       })
       .prefix('/v1/inventory')
       .use(middleware.auth())
+      .as('api.v1.inventory')
 
     router
       .group(() => {
-        router.get('/clinic', '#controllers/purchase_requests_controller.getClinicPurchaseRequests')
-        router.post('/clinic', '#controllers/purchase_requests_controller.newPurchaseRequest')
-        router.post(
-          ':purchaseRequestId/clinic/received',
-          '#controllers/purchase_requests_controller.clinicReceivedPurchaseRequest'
-        )
-        router.post(
-          ':purchaseRequestId/clinic/upload-invoice',
-          '#controllers/purchase_requests_controller.clinicUploadInvoice'
-        )
-        router.delete(
-          ':purchaseRequestId/clinic',
-          '#controllers/purchase_requests_controller.clinicDeletePurchaseRequest'
-        )
-        router.get(
-          ':purchaseRequestId/clinic/invoice-signed-url',
-          '#controllers/purchase_requests_controller.getInvoiceSignedUrl'
-        )
+        router
+          .get('/clinic', '#controllers/purchase_requests_controller.getClinicPurchaseRequests')
+          .as('getClinicPurchaseRequests')
+        router
+          .post('/clinic', '#controllers/purchase_requests_controller.newPurchaseRequest')
+          .as('newPurchaseRequest')
+        router
+          .post(
+            ':purchaseRequestId/clinic/received',
+            '#controllers/purchase_requests_controller.clinicReceivedPurchaseRequest'
+          )
+          .as('clinicReceivedPurchaseRequest')
+        router
+          .post(
+            ':purchaseRequestId/clinic/upload-invoice',
+            '#controllers/purchase_requests_controller.clinicUploadInvoice'
+          )
+          .as('clinicUploadInvoice')
+        router
+          .delete(
+            ':purchaseRequestId/clinic',
+            '#controllers/purchase_requests_controller.clinicDeletePurchaseRequest'
+          )
+          .as('clinicDeletePurchaseRequest')
+        router
+          .get(
+            ':purchaseRequestId/clinic/invoice-signed-url',
+            '#controllers/purchase_requests_controller.getInvoiceSignedUrl'
+          )
+          .as('getInvoiceSignedUrl')
       })
       .prefix('/v1/purchase-requests')
       .use(middleware.auth())
+      .as('purchaseRequests')
 
     router
       .group(() => {
-        router.get('/clinic', '#controllers/item_suppliers_controller.getClinicSuppliers')
+        router
+          .get('/clinic', '#controllers/item_suppliers_controller.getClinicSuppliers')
+          .as('api.v1.itemSuppliers.getClinicSuppliers')
       })
       .prefix('/v1/item-suppliers')
       .use(middleware.auth())
+      .as('api.v1.itemSuppliers')
 
-    router.post('/login', '#controllers/login_controller.login')
-    router.post('/logout', '#controllers/login_controller.logout')
-    router.post('/users', '#controllers/users_controller.createUser')
+    router.post('/login', '#controllers/login_controller.login').as('api.login')
+    router.post('/logout', '#controllers/login_controller.logout').as('api.logout')
+    router.post('/users', '#controllers/users_controller.createUser').as('api.users.createUser')
   })
   .prefix('/api')
 
-// Inertia routes
+router.get('/', '#controllers/inertia/home_controller.handle').use(middleware.auth()).as('home')
+
 router
-  .on('/')
-  .setHandler(async (ctx) => {
-    const user = await ctx.auth.user
-    if (!user) return ctx.inertia.render('login')
-    const queryString = ctx.request.qs()
-    const page = queryString.page ?? 1
-    const limit = queryString.limit ?? 10
-    const contractsService = await app.container.make(ContractsService)
-    const queryClient = getQueryClient()
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: ['contracts', 'contractsQuantityEndingIn30Days'],
-        queryFn: async () => ({
-          ammount: await contractsService.getContractsQuantityEndingIn30Days(user.clinicId),
-        }),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['contracts', 'activeContractsQuantity'],
-        queryFn: async () => ({
-          ammount: await contractsService.getActiveContractsQuantity(user.clinicId),
-        }),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['contracts'],
-        queryFn: () => contractsService.getContractsPaginated(user.clinicId, page, limit),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['contracts', 'contractsCreatedInLast12Months'],
-        queryFn: () => contractsService.getContractsCreatedInLast12Months(user.clinicId),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['inventory', 'itemsNeedingReplacement'],
-        queryFn: () => Item.itemsNeedingReplacement(user.clinicId, { page, limit }),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['inventory', 'inventory-value'],
-        queryFn: async () => {
-          const inventoryValue = await ItemUnit.calculateInventoryValue(user.clinicId)
-          return {
-            inventoryValue,
-          }
-        },
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['inventory', 'inventory-quantity'],
-        queryFn: async () => {
-          const [itemsQuantity, categoriesQuantity] = await Promise.all([
-            ItemUnit.availableUnits(user.clinicId),
-            ItemUnit.availableCategories(user.clinicId),
-          ])
-          return {
-            itemsQuantity,
-            categoriesQuantity,
-          }
-        },
-      }),
-    ])
-    return ctx.inertia.render('home', {
-      ...returnDehydratedState(queryClient),
-    })
-  })
+  .get('/inventario', '#controllers/inertia/inventory_controller.handle')
   .use(middleware.auth())
+  .as('inventory')
+
 router
-  .on('/inventario/novo-item')
-  .setHandler(async (ctx) => {
-    const user = await ctx.auth.user
-    const queryClient = getQueryClient()
-    const page = ctx.request.qs().page ? Number(ctx.request.qs().page) : 1
-    const limit = ctx.request.qs().limit ? Number(ctx.request.qs().limit) : 10
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: ['inventory', 'items'],
-        queryFn: async () =>
-          Item.itemsWithMostTransactionsWithinLast12Months(user!.clinicId, {
-            page,
-            limit,
-          }),
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['inventory', 'item-categories'],
-        queryFn: async () =>
-          ItemCategory.findManyBy({
-            clinicId: user!.clinicId,
-          }),
-      }),
-    ])
-    return ctx.inertia.render('inventario/novo_item', {
-      ...returnDehydratedState(queryClient),
-    })
-  })
+  .get('/inventario/novo-item', '#controllers/inertia/add_inventory_item_controller.handle')
   .use(middleware.auth())
+  .as('addInventoryItem')
+
 router
-  .on('/inventario')
-  .setHandler(async (ctx) => {
-    const user = await ctx.auth.user
-    const queryClient = getQueryClient()
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: ['inventory', 'items'],
-        queryFn: () => Item.getClinicItems(user!.clinicId),
-      }),
-    ])
-    return ctx.inertia.render('inventario/itens', {
-      ...returnDehydratedState(queryClient),
-    })
-  })
+  .get('/solicitacoes-de-compra', '#controllers/inertia/purchase_requests_controller.handle')
   .use(middleware.auth())
-router
-  .on('/solicitacoes-de-compra')
-  .setHandler(async (ctx) => {
-    const user = await ctx.auth.user
-    const queryClient = getQueryClient()
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: ['purchase-requests', 'clinic'],
-        queryFn: async () => {
-          const purchaseRequests = await PurchaseRequest.query()
-            .where('clinicId', user!.clinicId)
-            .preload('purchaseRequestItems', (purchaseRequestItemsQuery) => {
-              purchaseRequestItemsQuery.preload('item')
-            })
-            .preload('itemSupplier')
-          return purchaseRequests.map((purchaseRequests) => purchaseRequests.toJSON())
-        },
-      }),
-    ])
-    return ctx.inertia.render('solicitacoes_de_compra/solicitacoes_de_compra', {
-      ...returnDehydratedState(queryClient),
-    })
-  })
-  .use(middleware.auth())
+  .as('purchaseRequests')
+
 router.on('/login').renderInertia('login').use(middleware.guest())
-router.on('/esqueci-minha-senha').renderInertia('esqueci-minha-senha').use(middleware.guest())
+router
+  .on('/esqueci-minha-senha')
+  .renderInertia('esqueci-minha-senha')
+  .use(middleware.guest())
+  .as('forgotPassword')
 
 router.get('/swagger', async () => {
   return AutoSwagger.default.docs(router.toJSON(), swagger)

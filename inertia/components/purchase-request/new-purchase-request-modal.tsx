@@ -31,9 +31,6 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { useQuery } from '@tanstack/react-query'
-import { getClinicItems } from '~/api/inventory.api'
-import { getClinicSuppliers } from '~/api/item-supplier.api'
 
 const schema = z.object({
   fornecedor: z.string().min(1, 'Selecione um fornecedor'),
@@ -60,14 +57,16 @@ export function NewPurchaseRequestModal({
   onClose,
   onSubmit,
 }: NewPurchaseRequestModalProps) {
-  const { data: items } = useQuery({
-    queryKey: ['inventory', 'items'],
-    queryFn: () => getClinicItems(),
-  })
-  const { data: suppliers } = useQuery({
-    queryKey: ['item-suppliers', 'clinic'],
-    queryFn: () => getClinicSuppliers(),
-  })
+  const items = []
+  const suppliers = []
+  // const { data: items } = useQuery({
+  //   queryKey: ['inventory', 'items'],
+  //   queryFn: () => getClinicItems(),
+  // })
+  // const { data: suppliers } = useQuery({
+  //   queryKey: ['item-suppliers', 'clinic'],
+  //   queryFn: () => getClinicSuppliers(),
+  // })
 
   const form = useForm<NewPurchaseRequestFormValues>({
     resolver: zodResolver(schema),

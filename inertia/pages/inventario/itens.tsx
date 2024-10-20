@@ -19,16 +19,11 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
-import { getClinicItems, GetClinicItemsResponse } from '~/api/inventory.api'
-import { useQuery } from '@tanstack/react-query'
+import { GetClinicItemsResponse } from '~/api/inventory.api'
 import { Link } from '@inertiajs/react'
 import { cn } from '~/lib/utils'
 
-export default function ItemsPage() {
-  const { data: items, status: itemsStatus } = useQuery({
-    queryKey: ['inventory', 'items'],
-    queryFn: () => getClinicItems(),
-  })
+export default function ItemsPage({ items }) {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [data, setData] = useState<GetClinicItemsResponse>(items ?? [])
@@ -67,13 +62,6 @@ export default function ItemsPage() {
     }
     return sortableItems
   }, [data, sortConfig, searchTerm])
-
-  useEffect(() => {
-    if (itemsStatus === 'success') {
-      if (!items) return
-      setData(items)
-    }
-  }, [items])
 
   const pageCount = Math.ceil(sortedAndFilteredItems.length / itemsPerPage)
   const paginatedItems = sortedAndFilteredItems.slice(

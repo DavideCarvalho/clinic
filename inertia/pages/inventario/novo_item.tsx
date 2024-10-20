@@ -5,15 +5,10 @@ import { Label } from '@/components/ui/label'
 import { Form } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { getQueryClient } from '~/lib/query_client'
 import { ClinicLayout } from '~/layouts/clinic_layout'
-import { Link, router } from '@inertiajs/react'
+import { Link } from '@inertiajs/react'
 import { ArrowLeft } from 'lucide-react'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { createItem, getClinicItemCategories } from '~/api/inventory.api'
 import { SelectWithSearch } from '~/lib/common/select-with-search'
-import { toast } from 'sonner'
-import { LoaderIcon } from 'lucide-react'
 
 const schema = z.object({
   name: z.string().min(1),
@@ -21,31 +16,25 @@ const schema = z.object({
   itemCategoryId: z.string().uuid(),
 })
 
-export default function NewItemPage() {
-  const queryClient = getQueryClient()
-  const { data: categories } = useQuery({
-    queryKey: ['inventory', 'item-categories'],
-    queryFn: () => getClinicItemCategories(),
-  })
-
-  const saveNewItemMutation = useMutation({
-    mutationFn: async ({ name, minimumQuantity, itemCategoryId }: z.infer<typeof schema>) => {
-      const toastId = toast.loading('Criando item...')
-      try {
-        await createItem({
-          name,
-          minimumQuantity,
-          itemCategoryId,
-        })
-        toast.dismiss(toastId)
-        toast.success('Item criado com sucesso!')
-        router.visit('/inventario')
-      } catch (e) {
-        toast.dismiss(toastId)
-        toast.error('Erro ao criar o item!')
-      }
-    },
-  })
+export default function NewItemPage({ categories }) {
+  // const saveNewItemMutation = useMutation({
+  //   mutationFn: async ({ name, minimumQuantity, itemCategoryId }: z.infer<typeof schema>) => {
+  //     const toastId = toast.loading('Criando item...')
+  //     try {
+  //       await createItem({
+  //         name,
+  //         minimumQuantity,
+  //         itemCategoryId,
+  //       })
+  //       toast.dismiss(toastId)
+  //       toast.success('Item criado com sucesso!')
+  //       router.visit('/inventario')
+  //     } catch (e) {
+  //       toast.dismiss(toastId)
+  //       toast.error('Erro ao criar o item!')
+  //     }
+  //   },
+  // })
 
   const form = useForm<z.infer<typeof schema>>({
     defaultValues: {
@@ -63,16 +52,16 @@ export default function NewItemPage() {
   const itemCategoryId = form.watch('itemCategoryId')
 
   function handleSubmit(data: z.infer<typeof schema>) {
-    if (saveNewItemMutation.isPending) return
-    saveNewItemMutation
-      .mutateAsync(data)
-      .then(() => {
-        form.reset()
-      })
-      .finally(() => {
-        queryClient.invalidateQueries()
-        saveNewItemMutation.reset()
-      })
+    // if (saveNewItemMutation.isPending) return
+    // saveNewItemMutation
+    //   .mutateAsync(data)
+    //   .then(() => {
+    //     form.reset()
+    //   })
+    //   .finally(() => {
+    //     router.reload()
+    //     saveNewItemMutation.reset()
+    //   })
   }
 
   return (
@@ -116,9 +105,9 @@ export default function NewItemPage() {
               </div>
               <Button type="submit" className="w-full">
                 Adicionar Item
-                {saveNewItemMutation.isPending && (
+                {/* {saveNewItemMutation.isPending && (
                   <LoaderIcon className="ml-2 h-4 w-4 animate-spin" />
-                )}
+                )} */}
               </Button>
             </form>
           </Form>

@@ -15,28 +15,18 @@ import {
   PurchaseRequestArrivedModal,
   PurchaseRequestArrivedModalFormValues,
 } from '~/components/purchase-request/purchase-request-arrived-modal'
-import {
-  getClinicPurchaseRequests,
-  GetClinicPurchaseRequestsResponse,
-  clinicReceivedPurchaseRequest,
-  newPurchaseRequest,
-  clinicUploadInvoice,
-  clinicDeletePurchaseRequest,
-  getInvoiceSignedUrl,
-} from '~/api/purchase-request.api'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { GetClinicPurchaseRequestsResponse, getInvoiceSignedUrl } from '~/api/purchase-request.api'
 import { format } from 'date-fns'
 import { toast } from 'sonner'
-import { getQueryClient } from '~/lib/query_client'
 import {
   NewPurchaseRequestFormValues,
   NewPurchaseRequestModal,
 } from '~/components/purchase-request/new-purchase-request-modal'
 import { UploadInvoicePurchaseRequestModal } from '~/components/purchase-request/upload-invoice-purchase-request-modal'
 import { ConfirmDeletionModal } from '~/components/common/confirm-deletion-modal'
+import { router } from '@inertiajs/react'
 
-export default function OrdemsDeCompraPage() {
-  const queryClient = getQueryClient()
+export default function OrdemsDeCompraPage({ purchaseRequests }) {
   const [isArrivalModalOpen, setIsArrivalModallOpen] = useState(false)
   const [isCancelPurchaseRequestModalOpen, setIsCancelPurchaseRequestModalOpen] = useState(false)
   const [isUploadInvoiceModalOpen, setIsUploadInvoiceModalOpen] = useState(false)
@@ -44,44 +34,40 @@ export default function OrdemsDeCompraPage() {
   const [selectedPurchaseRequest, setSelectedPurchaseRequest] = useState<
     GetClinicPurchaseRequestsResponse[0] | null
   >(null)
-  const { data: solicitacoesCompra } = useQuery({
-    queryKey: ['purchase-requests', 'clinic'],
-    queryFn: () => getClinicPurchaseRequests(),
-  })
 
-  const newPurchaseRequestMutation = useMutation({
-    mutationFn: newPurchaseRequest,
-  })
+  // const newPurchaseRequestMutation = useMutation({
+  //   mutationFn: newPurchaseRequest,
+  // })
 
-  const clinicUploadInvoiceMutation = useMutation({
-    mutationFn: clinicUploadInvoice,
-  })
+  // const clinicUploadInvoiceMutation = useMutation({
+  //   mutationFn: clinicUploadInvoice,
+  // })
 
-  const clinicDeletePurchaseRequestMutation = useMutation({
-    mutationFn: clinicDeletePurchaseRequest,
-  })
+  // const clinicDeletePurchaseRequestMutation = useMutation({
+  //   mutationFn: clinicDeletePurchaseRequest,
+  // })
 
-  const clinicReceivedPurchaseRequestMutation = useMutation({
-    mutationFn: clinicReceivedPurchaseRequest,
-  })
+  // const clinicReceivedPurchaseRequestMutation = useMutation({
+  //   mutationFn: clinicReceivedPurchaseRequest,
+  // })
 
   async function handleNewPurchaseRequest(data: NewPurchaseRequestFormValues) {
     const toastId = toast.loading('Criando solicitação de compra...')
     try {
-      await newPurchaseRequestMutation.mutateAsync({
-        supplier: data.fornecedor,
-        items: data.itens.map((item) => ({
-          id: item.id,
-          quantidade: item.quantidade,
-        })),
-      })
+      // await newPurchaseRequestMutation.mutateAsync({
+      //   supplier: data.fornecedor,
+      //   items: data.itens.map((item) => ({
+      //     id: item.id,
+      //     quantidade: item.quantidade,
+      //   })),
+      // })
       toast.dismiss(toastId)
       toast.success('Solicitação de compra criada com sucesso!')
     } catch (e) {
       toast.dismiss(toastId)
       toast.error('Erro ao criar solicitação de compra!')
     } finally {
-      queryClient.invalidateQueries()
+      router.reload()
     }
   }
 
@@ -186,16 +172,16 @@ export default function OrdemsDeCompraPage() {
     if (selectedPurchaseRequest.status !== 'WAITING_ARRIVAL') return
     const toastId = toast.loading('Registrando chegada...')
     try {
-      await clinicReceivedPurchaseRequestMutation.mutateAsync({
-        purchaseRequestId: selectedPurchaseRequest.id,
-        arrivalDate: data.arrivalDate,
-        invoice: data.invoice,
-        items: data.items.map((item) => ({
-          itemId: item.itemId,
-          askedQuantity: item.askedQuantity,
-          receivedQuantity: item.receivedQuantity,
-        })),
-      })
+      // await clinicReceivedPurchaseRequestMutation.mutateAsync({
+      //   purchaseRequestId: selectedPurchaseRequest.id,
+      //   arrivalDate: data.arrivalDate,
+      //   invoice: data.invoice,
+      //   items: data.items.map((item) => ({
+      //     itemId: item.itemId,
+      //     askedQuantity: item.askedQuantity,
+      //     receivedQuantity: item.receivedQuantity,
+      //   })),
+      // })
       toast.dismiss(toastId)
       toast.success('Chegada registrada com sucesso!')
     } catch (e) {
@@ -203,7 +189,7 @@ export default function OrdemsDeCompraPage() {
       toast.dismiss(toastId)
       toast.error('Erro ao registrar chegada!')
     } finally {
-      queryClient.invalidateQueries()
+      router.reload()
     }
     setIsArrivalModallOpen(false)
   }
@@ -224,9 +210,9 @@ export default function OrdemsDeCompraPage() {
     if (!selectedPurchaseRequest) return
     const toastId = toast.loading('Deletando solicitação de compra...')
     try {
-      await clinicDeletePurchaseRequestMutation.mutateAsync({
-        purchaseRequestId: selectedPurchaseRequest.id,
-      })
+      // await clinicDeletePurchaseRequestMutation.mutateAsync({
+      //   purchaseRequestId: selectedPurchaseRequest.id,
+      // })
       toast.dismiss(toastId)
       toast.success('Solicitação de compra deletada com sucesso!')
       setSelectedPurchaseRequest(null)
@@ -235,7 +221,7 @@ export default function OrdemsDeCompraPage() {
       toast.dismiss(toastId)
       toast.error('Erro ao deletar solicitação de compra!')
     } finally {
-      queryClient.invalidateQueries()
+      router.reload()
     }
   }
 
@@ -243,17 +229,17 @@ export default function OrdemsDeCompraPage() {
     if (!selectedPurchaseRequest) return
     const toastId = toast.loading('Enviando nota fiscal...')
     try {
-      await clinicUploadInvoiceMutation.mutateAsync({
-        purchaseRequestId: selectedPurchaseRequest.id,
-        body: {
-          invoice,
-        },
-      })
+      // await clinicUploadInvoiceMutation.mutateAsync({
+      //   purchaseRequestId: selectedPurchaseRequest.id,
+      //   body: {
+      //     invoice,
+      //   },
+      // })
       toast.dismiss(toastId)
       toast.success('Nota fiscal enviada com sucesso!')
       setIsUploadInvoiceModalOpen(false)
       setSelectedPurchaseRequest(null)
-      queryClient.invalidateQueries()
+      router.reload()
     } catch (e) {
       toast.dismiss(toastId)
       toast.error('Erro ao enviar nota fiscal!')
@@ -291,7 +277,7 @@ export default function OrdemsDeCompraPage() {
         Nova Solicitação de Compra
       </Button>
       <ExpandableTable
-        data={solicitacoesCompra ?? []}
+        data={purchaseRequests ?? []}
         columns={columns}
         renderSubComponent={renderSubComponent}
         getRowCanExpand={getRowCanExpand}

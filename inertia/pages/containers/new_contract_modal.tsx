@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -24,7 +23,7 @@ import { Input } from '~/lib/components/ui/input'
 import { Label } from '~/lib/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '~/lib/components/ui/popover'
 import { toast } from 'sonner'
-import { DateTime } from 'luxon'
+import { router } from '@inertiajs/react'
 
 const schema = z.object({
   clientEmail: z
@@ -42,35 +41,34 @@ interface NewContractModalProps {
 }
 
 export function NewContractModal({ isOpen, onSubmit, onClose }: NewContractModalProps) {
-  const queryClient = useQueryClient()
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   })
 
-  const { mutateAsync: createContract } = useMutation({
-    mutationFn: async ({ startDate, endDate, clientEmail, files }: z.infer<typeof schema>) => {
-      const filesInBase64: string[] = []
-      for (const file of files) {
-        filesInBase64.push(await getBase64(file))
-      }
-      return fetch('/api/v1/contracts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          startDate: DateTime.fromJSDate(startDate),
-          endDate: DateTime.fromJSDate(endDate),
-          description: '',
-          clientEmail,
-          files: filesInBase64,
-        }),
-      }).then((res) => {
-        if (!res.ok) throw new Error(res.statusText)
-        return res.json()
-      })
-    },
-  })
+  // const { mutateAsync: createContract } = useMutation({
+  //   mutationFn: async ({ startDate, endDate, clientEmail, files }: z.infer<typeof schema>) => {
+  //     const filesInBase64: string[] = []
+  //     for (const file of files) {
+  //       filesInBase64.push(await getBase64(file))
+  //     }
+  //     return fetch('/api/v1/contracts', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         startDate: DateTime.fromJSDate(startDate),
+  //         endDate: DateTime.fromJSDate(endDate),
+  //         description: '',
+  //         clientEmail,
+  //         files: filesInBase64,
+  //       }),
+  //     }).then((res) => {
+  //       if (!res.ok) throw new Error(res.statusText)
+  //       return res.json()
+  //     })
+  //   },
+  // })
 
   function getBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -87,12 +85,12 @@ export function NewContractModal({ isOpen, onSubmit, onClose }: NewContractModal
   async function onSubmitForm(data: z.infer<typeof schema>) {
     toast.loading('Criando contrato...')
     try {
-      await createContract({
-        startDate: data.startDate,
-        endDate: data.endDate,
-        clientEmail: data.clientEmail,
-        files: data.files,
-      })
+      // await createContract({
+      //   startDate: data.startDate,
+      //   endDate: data.endDate,
+      //   clientEmail: data.clientEmail,
+      //   files: data.files,
+      // })
       toast.dismiss()
       toast.success('Contrato criado com sucesso!')
       onSubmit()
@@ -100,7 +98,7 @@ export function NewContractModal({ isOpen, onSubmit, onClose }: NewContractModal
       toast.dismiss()
       toast.error('Erro ao criar o contrato!')
     } finally {
-      queryClient.invalidateQueries()
+      router.reload()
     }
   }
   return (

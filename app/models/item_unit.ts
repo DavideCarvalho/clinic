@@ -22,7 +22,7 @@ export default class ItemUnit extends BaseUUIDModel {
     const [response]: [[{ total: string }]] = await db.rawQuery(
       `
       SELECT
-        SUM(purchase_requests.bought_unitary_value) as total
+        SUM(item_units.price) as total
       FROM
         item_units
       INNER JOIN
@@ -31,6 +31,8 @@ export default class ItemUnit extends BaseUUIDModel {
         purchase_requests ON purchase_requests.id = item_batches.purchase_request_id
       WHERE
         purchase_requests.clinic_id = ?
+      AND
+        item_units.status = 'AVAILABLE'
       `,
       [clinicId]
     )
@@ -50,8 +52,6 @@ export default class ItemUnit extends BaseUUIDModel {
         purchase_requests ON purchase_requests.id = item_batches.purchase_request_id
       WHERE
         purchase_requests.clinic_id = ?
-      AND
-        purchase_requests.bought_unitary_value IS NOT NULL
       AND
         item_units.status = 'AVAILABLE'
       `,
@@ -77,8 +77,6 @@ export default class ItemUnit extends BaseUUIDModel {
         item_categories ON item_categories.id = items.item_category_id
       WHERE
         purchase_requests.clinic_id = ?
-      AND
-        purchase_requests.bought_unitary_value IS NOT NULL
       AND
         item_units.status = 'AVAILABLE'
       `,

@@ -10,30 +10,10 @@ import {
 import { Progress } from '~/lib/components/ui/progress'
 import { AlertTriangle, DollarSign, Package } from 'lucide-react'
 import { ClinicLayout } from '~/layouts/clinic_layout'
-import {
-  getInventoryQuantity,
-  getInventoryValue,
-  getItemsNeedingReplacement,
-} from '~/api/inventory.api'
-import { useQuery } from '@tanstack/react-query'
 import { formatCurrency } from '~/lib/format-currency'
 import { Head } from '@inertiajs/react'
 
-export default function HomePage() {
-  const { data: itemsNeedingReplacement } = useQuery({
-    queryKey: ['inventory', 'itemsNeedingReplacement'],
-    queryFn: () => getItemsNeedingReplacement(),
-  })
-  const { data: inventoryValue } = useQuery({
-    queryKey: ['inventory', 'inventory-value'],
-    queryFn: () => getInventoryValue(),
-  })
-
-  const { data: inventoryQuantity } = useQuery({
-    queryKey: ['inventory', 'inventory-quantity'],
-    queryFn: () => getInventoryQuantity(),
-  })
-
+export default function HomePage({ inventoryQuantity, inventoryValue, itemsNeedingReplacement }) {
   const value = inventoryValue ? inventoryValue?.inventoryValue / 100 : 0
   return (
     <>
@@ -138,7 +118,7 @@ export default function HomePage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {itemsNeedingReplacement?.data?.map((item) => (
+                {itemsNeedingReplacement.data.data.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.name}</TableCell>
                     <TableCell>{item.itemCategory.name}</TableCell>

@@ -1,5 +1,5 @@
-import { belongsTo, column, hasMany, manyToMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
+import { belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import BaseUUIDModel from './utils/base_uuid_model.js'
 import ItemCategory from './item_category.js'
 import db from '@adonisjs/lucid/services/db'
@@ -7,7 +7,6 @@ import ItemUnit from './item_unit.js'
 import ItemBatch from './item_batch.js'
 import { RawQueryResponse } from './utils/raw-query-response.js'
 import ItemTransaction from './item_transaction.js'
-import PurchaseRequest from './purchase_request.js'
 import PurchaseRequestItem from './purchase_request_item.js'
 
 export default class Item extends BaseUUIDModel {
