@@ -7,8 +7,8 @@ import { throttle } from './limiter.js'
 
 import './routes/api/v1/contracts.js'
 import './routes/api/v1/inventory.js'
-import './routes/api/v1/purchase-requests.js'
-import './routes/api/v1/item-suppliers.js'
+import './routes/api/v1/purchase_requests.js'
+import './routes/api/v1/item_suppliers.js'
 
 const ApiLoginController = () => import('#controllers/login_controller')
 const UsersController = () => import('#controllers/users_controller')
