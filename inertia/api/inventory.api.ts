@@ -3,6 +3,7 @@ import Item from '#models/item'
 import { InventoryValueResponse } from '#controllers/dto/inventory_value.response'
 import { Pageable } from './utils/pageable.dto'
 import ItemCategory from '#models/item_category'
+import { ItemDTO } from '#controllers/dto/item.dto'
 
 export type DeepNonFunctionAndNonDollarProperties<T> = {
   [K in keyof T as K extends `$${string}`
@@ -36,7 +37,7 @@ export function getInventoryQuantity(): Promise<InventoryQuantityResponse> {
 }
 
 export type GetClinicItemsResponse = DeepNonFunctionAndNonDollarProperties<
-  Item & { itemCategoryName: string; inventoryValue: number }
+  ItemDTO & { quantity: number; inventoryValue: number }
 >[]
 
 export function getClinicItems(): Promise<GetClinicItemsResponse> {

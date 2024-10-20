@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Table,
   TableBody,
@@ -22,11 +22,15 @@ import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { GetClinicItemsResponse } from '~/api/inventory.api'
 import { Link } from '@inertiajs/react'
 import { cn } from '~/lib/utils'
+import { InventoryControllerResponse } from '#controllers/inertia/inventory_controller'
+import { Propsify } from '#controllers/utils/propsify'
 
-export default function ItemsPage({ items }) {
+type ItemsPageProps = Propsify<InventoryControllerResponse>
+
+export default function ItemsPage({ items }: ItemsPageProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
-  const [data, setData] = useState<GetClinicItemsResponse>(items ?? [])
+  const [data, setData] = useState<GetClinicItemsResponse>(items)
   const [sortConfig, setSortConfig] = useState<{
     key: keyof GetClinicItemsResponse[0]
     direction: 'asc' | 'desc'

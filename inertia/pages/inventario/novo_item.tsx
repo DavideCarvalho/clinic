@@ -7,10 +7,13 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { ClinicLayout } from '~/layouts/clinic_layout'
 import { Link, router } from '@inertiajs/react'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, LoaderIcon } from 'lucide-react'
 import { SelectWithSearch } from '~/lib/common/select-with-search'
 import { tuyau } from '~/api/tuyau-client'
 import { toast } from 'sonner'
+import { AddInventoryItemControllerResponse } from '#controllers/inertia/add_inventory_item_controller'
+import { Propsify } from '#controllers/utils/propsify'
+import { ReactNode, useState } from 'react'
 
 const schema = z.object({
   name: z.string().min(1),
@@ -18,26 +21,10 @@ const schema = z.object({
   itemCategoryId: z.string().uuid(),
 })
 
-export default function NewItemPage({ categories }) {
-  // const saveNewItemMutation = useMutation({
-  //   mutationFn: async ({ name, minimumQuantity, itemCategoryId }: z.infer<typeof schema>) => {
-  //     const toastId = toast.loading('Criando item...')
-  //     try {
-  //       await createItem({
-  //         name,
-  //         minimumQuantity,
-  //         itemCategoryId,
-  //       })
-  //       toast.dismiss(toastId)
-  //       toast.success('Item criado com sucesso!')
-  //       router.visit('/inventario')
-  //     } catch (e) {
-  //       toast.dismiss(toastId)
-  //       toast.error('Erro ao criar o item!')
-  //     }
-  //   },
-  // })
+type NewItemPageProps = Propsify<AddInventoryItemControllerResponse>
 
+export default function NewItemPage({ categories }: NewItemPageProps) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const form = useForm<z.infer<typeof schema>>({
     defaultValues: {
       name: '',
@@ -45,15 +32,15 @@ export default function NewItemPage({ categories }) {
     },
   })
 
-  const options =
-    categories?.map((category) => ({
-      value: category.id,
-      label: category.name,
-    })) ?? []
+  const options = categories.map((category) => ({
+    value: category.id,
+    label: category.name,
+  }))
 
   const itemCategoryId = form.watch('itemCategoryId')
 
   async function handleSubmit(data: z.infer<typeof schema>) {
+    setIsSubmitting(true)
     const toastId = toast.loading('Criando item...')
     try {
       await tuyau.$route('api.v1.inventory.createItem').$post(data)
@@ -63,6 +50,8 @@ export default function NewItemPage({ categories }) {
     } catch (e) {
       toast.dismiss(toastId)
       toast.error('Erro ao criar o item!')
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -107,9 +96,7 @@ export default function NewItemPage({ categories }) {
               </div>
               <Button type="submit" className="w-full">
                 Adicionar Item
-                {/* {saveNewItemMutation.isPending && (
-                  <LoaderIcon className="ml-2 h-4 w-4 animate-spin" />
-                )} */}
+                {isSubmitting ? <LoaderIcon className="ml-2 h-4 w-4 animate-spin" /> : null}
               </Button>
             </form>
           </Form>
@@ -119,5 +106,4 @@ export default function NewItemPage({ categories }) {
   )
 }
 
-// @ts-expect-error layout is only for inertia but there's no type for that
-NewItemPage.layout = (page) => <ClinicLayout>{page}</ClinicLayout>
+NewItemPage.layout = (page: ReactNode) => <ClinicLayout>{page}</ClinicLayout>
