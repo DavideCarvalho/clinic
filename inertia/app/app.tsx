@@ -6,6 +6,8 @@ import { hydrateRoot } from 'react-dom/client'
 import { createInertiaApp } from '@inertiajs/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 import { Toaster } from 'sonner'
+import { TuyauProvider } from '@tuyau/inertia/react'
+import { tuyau } from '../api/tuyau-client'
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
 
@@ -22,8 +24,10 @@ createInertiaApp({
     hydrateRoot(
       el,
       <>
-        <App {...props} />
-        <Toaster />
+        <TuyauProvider client={tuyau}>
+          <App {...props} />
+          <Toaster />
+        </TuyauProvider>
       </>
     )
   },

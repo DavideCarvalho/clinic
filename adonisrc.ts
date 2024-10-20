@@ -15,7 +15,8 @@ export default defineConfig({
     () => import('@adonisjs/lucid/commands'),
     () => import('@adonisjs/mail/commands'),
     () => import('adonisjs-jobs/commands'),
-    () => import('@tuyau/core/commands')
+    () => import('@tuyau/core/commands'),
+    () => import('@tuyau/openapi/commands')
   ],
 
   /*
@@ -50,7 +51,8 @@ export default defineConfig({
     () => import('@adonisjs/transmit/transmit_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
     () => import('adonisjs-jobs/jobs_provider'),
-    () => import('@tuyau/core/tuyau_provider')
+    () => import('@tuyau/core/tuyau_provider'),
+    () => import('@tuyau/openapi/openapi_provider')
   ],
 
   /*

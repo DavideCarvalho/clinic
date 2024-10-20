@@ -111,6 +111,8 @@
     "@tanstack/react-table": "8.20.5",
     "@tuyau/client": "0.1.2",
     "@tuyau/core": "0.2.1",
+    "@tuyau/inertia": "0.0.2",
+    "@tuyau/openapi": "1.0.0",
     "@vinejs/vine": "2.1.0",
     "adonis-autoswagger": "3.63.0",
     "adonisjs-jobs": "0.0.21",
