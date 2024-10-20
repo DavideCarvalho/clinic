@@ -2,8 +2,15 @@ import Contract from '#models/contract'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
 import { format } from 'date-fns'
+import { ContractDTO } from '#controllers/dto/contract.dto'
+import { Paginated } from '#controllers/dto/paginated.dto'
+import { inject } from '@adonisjs/core'
+import { ContractTransformer } from '#services/transformers/contract.transformer'
 
+@inject()
 export default class ContractsService {
+  constructor(private readonly contractTransformer: ContractTransformer) {}
+
   async getContractsCreatedInLast12Months(clinicId: string) {
     const query = (await db.rawQuery(
       `
@@ -23,12 +30,23 @@ export default class ContractsService {
     return query.flat()
   }
 
-  getContractsPaginated(clinicId: string, page: number, limit: number) {
-    return Contract.query()
+  public async getContractsPaginated(
+    clinicId: string,
+    page: number,
+    limit: number
+  ): Promise<Paginated<ContractDTO>> {
+    const contracts = await Contract.query()
       .where('clinicId', clinicId)
       .orderBy('createdAt', 'desc')
       .preload('client')
       .paginate(page, limit)
+
+    return {
+      data: contracts
+        .toJSON()
+        .data.map((contract) => this.contractTransformer.toJSON(contract as Contract)),
+      meta: contracts.getMeta(),
+    }
   }
 
   async getContractsQuantityEndingIn30Days(clinicId: string) {

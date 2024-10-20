@@ -1,23 +1,23 @@
 import type { MakeTuyauRequest, MakeTuyauResponse } from '@tuyau/utils/types'
 import type { InferInput } from '@vinejs/vine/types'
 
-type ApiV1ContractsGetHead = {
+type V1ContractsGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/contracts_controller.ts').default['getContractsPaginated']>
 }
-type ApiV1ContractsPost = {
+type V1ContractsPost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/contract.ts')['createContractValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/contracts_controller.ts').default['createContract']>
 }
-type ApiV1ContractsCreatedinlast12monthsGetHead = {
+type V1ContractsCreatedinlast12monthsGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/contracts_controller.ts').default['getContractsCreatedInLast12Months']>
 }
-type ApiV1ContractsEndingin30daysCountGetHead = {
+type V1ContractsEndingin30daysCountGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/contracts_controller.ts').default['getContractsQuantityEndingIn30Days']>
 }
-type ApiV1ContractsActiveCountGetHead = {
+type V1ContractsActiveCountGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/contracts_controller.ts').default['getActiveContractsQuantity']>
 }
@@ -114,37 +114,39 @@ type SolicitacoesDeCompraGetHead = {
   response: MakeTuyauResponse<import('../app/controllers/inertia/purchase_requests_controller.ts').default['handle']>
 }
 export interface ApiDefinition {
-  'api': {
-    'v1': {
-      'contracts': {
+  'v1': {
+    'contracts': {
+      '$url': {
+      };
+      '$get': V1ContractsGetHead;
+      '$head': V1ContractsGetHead;
+      '$post': V1ContractsPost;
+      'created-in-last-12-months': {
         '$url': {
         };
-        '$get': ApiV1ContractsGetHead;
-        '$head': ApiV1ContractsGetHead;
-        '$post': ApiV1ContractsPost;
-        'created-in-last-12-months': {
+        '$get': V1ContractsCreatedinlast12monthsGetHead;
+        '$head': V1ContractsCreatedinlast12monthsGetHead;
+      };
+      'ending-in-30-days': {
+        'count': {
           '$url': {
           };
-          '$get': ApiV1ContractsCreatedinlast12monthsGetHead;
-          '$head': ApiV1ContractsCreatedinlast12monthsGetHead;
-        };
-        'ending-in-30-days': {
-          'count': {
-            '$url': {
-            };
-            '$get': ApiV1ContractsEndingin30daysCountGetHead;
-            '$head': ApiV1ContractsEndingin30daysCountGetHead;
-          };
-        };
-        'active': {
-          'count': {
-            '$url': {
-            };
-            '$get': ApiV1ContractsActiveCountGetHead;
-            '$head': ApiV1ContractsActiveCountGetHead;
-          };
+          '$get': V1ContractsEndingin30daysCountGetHead;
+          '$head': V1ContractsEndingin30daysCountGetHead;
         };
       };
+      'active': {
+        'count': {
+          '$url': {
+          };
+          '$get': V1ContractsActiveCountGetHead;
+          '$head': V1ContractsActiveCountGetHead;
+        };
+      };
+    };
+  };
+  'api': {
+    'v1': {
       'inventory': {
         'clinic': {
           'items': {
@@ -282,38 +284,38 @@ export interface ApiDefinition {
 const routes = [
   {
     params: [],
-    name: 'api.v1.contracts.getContracts',
-    path: '/api/v1/contracts',
+    name: 'v1.getContracts',
+    path: '/v1/contracts',
     method: ["GET","HEAD"],
-    types: {} as ApiV1ContractsGetHead,
+    types: {} as V1ContractsGetHead,
   },
   {
     params: [],
-    name: 'api.v1.contracts.createContract',
-    path: '/api/v1/contracts',
+    name: 'v1.createContract',
+    path: '/v1/contracts',
     method: ["POST"],
-    types: {} as ApiV1ContractsPost,
+    types: {} as V1ContractsPost,
   },
   {
     params: [],
-    name: 'api.v1.contracts.getContractsCreatedInLast12Months',
-    path: '/api/v1/contracts/created-in-last-12-months',
+    name: 'v1.getContractsCreatedInLast12Months',
+    path: '/v1/contracts/created-in-last-12-months',
     method: ["GET","HEAD"],
-    types: {} as ApiV1ContractsCreatedinlast12monthsGetHead,
+    types: {} as V1ContractsCreatedinlast12monthsGetHead,
   },
   {
     params: [],
-    name: 'api.v1.contracts.getContractsQuantityEndingIn30Days',
-    path: '/api/v1/contracts/ending-in-30-days/count',
+    name: 'v1.getContractsQuantityEndingIn30Days',
+    path: '/v1/contracts/ending-in-30-days/count',
     method: ["GET","HEAD"],
-    types: {} as ApiV1ContractsEndingin30daysCountGetHead,
+    types: {} as V1ContractsEndingin30daysCountGetHead,
   },
   {
     params: [],
-    name: 'api.v1.contracts.getActiveContractsQuantity',
-    path: '/api/v1/contracts/active/count',
+    name: 'v1.getActiveContractsQuantity',
+    path: '/v1/contracts/active/count',
     method: ["GET","HEAD"],
-    types: {} as ApiV1ContractsActiveCountGetHead,
+    types: {} as V1ContractsActiveCountGetHead,
   },
   {
     params: [],

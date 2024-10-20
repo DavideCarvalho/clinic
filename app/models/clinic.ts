@@ -1,4 +1,3 @@
-import type { DateTime } from 'luxon'
 import { belongsTo, column, hasMany } from '@adonisjs/lucid/orm'
 import Contract from './contract.js'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'

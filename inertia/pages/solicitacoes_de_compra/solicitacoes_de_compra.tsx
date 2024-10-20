@@ -25,6 +25,7 @@ import {
 import { UploadInvoicePurchaseRequestModal } from '~/components/purchase-request/upload-invoice-purchase-request-modal'
 import { ConfirmDeletionModal } from '~/components/common/confirm-deletion-modal'
 import { router } from '@inertiajs/react'
+import { tuyau } from '~/api/tuyau-client'
 
 export default function OrdemsDeCompraPage({ purchaseRequests }) {
   const [isArrivalModalOpen, setIsArrivalModallOpen] = useState(false)
@@ -54,6 +55,7 @@ export default function OrdemsDeCompraPage({ purchaseRequests }) {
   async function handleNewPurchaseRequest(data: NewPurchaseRequestFormValues) {
     const toastId = toast.loading('Criando solicitação de compra...')
     try {
+      // tuyau.api.v1.
       // await newPurchaseRequestMutation.mutateAsync({
       //   supplier: data.fornecedor,
       //   items: data.itens.map((item) => ({

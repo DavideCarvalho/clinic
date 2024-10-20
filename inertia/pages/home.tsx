@@ -12,7 +12,10 @@ import { AlertTriangle, DollarSign, Package } from 'lucide-react'
 import { ClinicLayout } from '~/layouts/clinic_layout'
 import { formatCurrency } from '~/lib/format-currency'
 import { Head } from '@inertiajs/react'
-import type { HomePageProps } from '#controllers/inertia/home_controller'
+import { Propsify } from '#controllers/utils/propsify'
+import { HomeControllerResponse } from '#controllers/inertia/home_controller'
+
+type HomePageProps = Propsify<HomeControllerResponse>
 
 export default function HomePage({
   inventoryQuantity,

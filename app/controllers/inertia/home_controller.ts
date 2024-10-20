@@ -1,3 +1,6 @@
+import { ContractDTO } from '#controllers/dto/contract.dto'
+import { Paginated } from '#controllers/dto/paginated.dto'
+import { Propsify } from '#controllers/utils/propsify'
 import Item from '#models/item'
 import ItemUnit from '#models/item_unit'
 import ContractsService from '#services/contracts.service'
@@ -22,12 +25,9 @@ export default class HomeController {
       activeContractsQuantity: async () => ({
         ammount: await contractsService.getActiveContractsQuantity(user.clinicId),
       }),
-      contracts: async () => ({
-        data: await contractsService.getContractsPaginated(user.clinicId, page, limit),
-      }),
-      contractsCreatedInLast12Months: async () => ({
-        data: await contractsService.getContractsCreatedInLast12Months(user.clinicId),
-      }),
+      contracts: () => contractsService.getContractsPaginated(user.clinicId, page, limit),
+      contractsCreatedInLast12Months: () =>
+        contractsService.getContractsCreatedInLast12Months(user.clinicId),
       inventoryValue: () => ItemUnit.calculateInventoryValue(user.clinicId),
       inventoryQuantity: async () => ({
         itemsQuantity: await ItemUnit.availableUnits(user.clinicId),
@@ -38,23 +38,15 @@ export default class HomeController {
   }
 }
 
-type UnwrapPromise<T> = T extends Promise<infer U> ? U : T
-
-type SimplifyControllerResponse<T> = {
-  [K in keyof T]: T[K] extends () => Promise<infer R>
-    ? UnwrapPromise<R>
-    : T[K] extends () => infer R
-      ? R
-      : T[K]
-}
-
 export interface HomeControllerResponse {
   inventoryValue: () => Promise<number>
-  inventoryQuantity: any
+  contractsQuantityEndingIn30Days: () => Promise<{ ammount: number }>
+  activeContractsQuantity: () => Promise<{ ammount: number }>
+  inventoryQuantity: () => Promise<{ itemsQuantity: number; categoriesQuantity: number }>
+  contracts: () => Promise<Paginated<ContractDTO>>
+  contractsCreatedInLast12Months: () => Promise<{ year: number; month: number; count: number }[]>
   itemsNeedingReplacement: () => Promise<{
     meta: any
     data: any[]
   }>
 }
-
-export type HomePageProps = SimplifyControllerResponse<HomeControllerResponse>
