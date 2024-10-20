@@ -39,4 +39,4 @@ router
   })
   .prefix('/v1/inventory')
   .use(middleware.auth())
-  .as('v1.inventory')
+  .as('api.v1.inventory')

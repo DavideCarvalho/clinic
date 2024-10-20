@@ -40,4 +40,4 @@ router
   })
   .prefix('/v1/purchase-requests')
   .use(middleware.auth())
-  .as('v1.purchaseRequests')
+  .as('api.v1.purchaseRequests')

@@ -6,9 +6,11 @@ import { Form } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { ClinicLayout } from '~/layouts/clinic_layout'
-import { Link } from '@inertiajs/react'
+import { Link, router } from '@inertiajs/react'
 import { ArrowLeft } from 'lucide-react'
 import { SelectWithSearch } from '~/lib/common/select-with-search'
+import { tuyau } from '~/api/tuyau-client'
+import { toast } from 'sonner'
 
 const schema = z.object({
   name: z.string().min(1),
@@ -51,17 +53,17 @@ export default function NewItemPage({ categories }) {
 
   const itemCategoryId = form.watch('itemCategoryId')
 
-  function handleSubmit(data: z.infer<typeof schema>) {
-    // if (saveNewItemMutation.isPending) return
-    // saveNewItemMutation
-    //   .mutateAsync(data)
-    //   .then(() => {
-    //     form.reset()
-    //   })
-    //   .finally(() => {
-    //     router.reload()
-    //     saveNewItemMutation.reset()
-    //   })
+  async function handleSubmit(data: z.infer<typeof schema>) {
+    const toastId = toast.loading('Criando item...')
+    try {
+      await tuyau.$route('api.v1.inventory.createItem').$post(data)
+      toast.dismiss(toastId)
+      toast.success('Item criado com sucesso!')
+      router.visit('/inventario')
+    } catch (e) {
+      toast.dismiss(toastId)
+      toast.error('Erro ao criar o item!')
+    }
   }
 
   return (

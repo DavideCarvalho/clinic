@@ -21,71 +21,71 @@ type V1ContractsActiveCountGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/contracts_controller.ts').default['getActiveContractsQuantity']>
 }
-type ApiV1InventoryClinicItemsPost = {
+type V1InventoryClinicItemsPost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/item.ts')['createItemValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['createItem']>
 }
-type ApiV1InventoryClinicItemsIdAddPost = {
+type V1InventoryClinicItemsIdAddPost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/item.ts')['changeItemQuantityValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['increaseItemQuantity']>
 }
-type ApiV1InventoryClinicItemsIdWithdrawPost = {
+type V1InventoryClinicItemsIdWithdrawPost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/item.ts')['changeItemQuantityValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['decreaseItemQuantity']>
 }
-type ApiV1InventoryClinicItemsMoreutilizedPost = {
+type V1InventoryClinicItemsMoreutilizedPost = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['moreUtilizedItems']>
 }
-type ApiV1InventoryClinicItemsNeedingreplacementGetHead = {
+type V1InventoryClinicItemsNeedingreplacementGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['itemsNeedingReplacement']>
 }
-type ApiV1InventoryClinicInventoryvalueGetHead = {
+type V1InventoryClinicInventoryvalueGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['inventoryValue']>
 }
-type ApiV1InventoryClinicInventoryquantityGetHead = {
+type V1InventoryClinicInventoryquantityGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['inventoryQuantity']>
 }
-type ApiV1InventoryClinicItemsGetHead = {
+type V1InventoryClinicItemsGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['getClinicItems']>
 }
-type ApiV1InventoryClinicItemsMostusedGetHead = {
+type V1InventoryClinicItemsMostusedGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['getItemsWithMostTransactionsWithinLast12Months']>
 }
-type ApiV1InventoryClinicItemsCategoriesGetHead = {
+type V1InventoryClinicItemsCategoriesGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/inventory_controller.ts').default['getCategories']>
 }
-type ApiV1PurchaserequestsClinicGetHead = {
+type V1PurchaserequestsClinicGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/purchase_requests_controller.ts').default['getClinicPurchaseRequests']>
 }
-type ApiV1PurchaserequestsClinicPost = {
+type V1PurchaserequestsClinicPost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/purchase_request.ts')['newPurchaseRequestValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/purchase_requests_controller.ts').default['newPurchaseRequest']>
 }
-type ApiV1PurchaserequestsIdClinicReceivedPost = {
+type V1PurchaserequestsIdClinicReceivedPost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/purchase_request.ts')['clinicReceivedPurchaseRequestValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/purchase_requests_controller.ts').default['clinicReceivedPurchaseRequest']>
 }
-type ApiV1PurchaserequestsIdClinicUploadinvoicePost = {
+type V1PurchaserequestsIdClinicUploadinvoicePost = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/purchase_request.ts')['clinicUploadInvoiceValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/purchase_requests_controller.ts').default['clinicUploadInvoice']>
 }
-type ApiV1PurchaserequestsIdClinicDelete = {
+type V1PurchaserequestsIdClinicDelete = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/purchase_request.ts')['clinicDeletePurchaseRequestValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/purchase_requests_controller.ts').default['clinicDeletePurchaseRequest']>
 }
-type ApiV1PurchaserequestsIdClinicInvoicesignedurlGetHead = {
+type V1PurchaserequestsIdClinicInvoicesignedurlGetHead = {
   request: MakeTuyauRequest<InferInput<typeof import('../app/validators/purchase_request.ts')['getInvoiceSignedUrlValidator']>>
   response: MakeTuyauResponse<import('../app/controllers/purchase_requests_controller.ts').default['getInvoiceSignedUrl']>
 }
-type ApiV1ItemsuppliersClinicGetHead = {
+type V1ItemsuppliersClinicGetHead = {
   request: unknown
   response: MakeTuyauResponse<import('../app/controllers/item_suppliers_controller.ts').default['getClinicSuppliers']>
 }
@@ -144,108 +144,106 @@ export interface ApiDefinition {
         };
       };
     };
-  };
-  'api': {
-    'v1': {
-      'inventory': {
-        'clinic': {
-          'items': {
-            '$url': {
-            };
-            '$post': ApiV1InventoryClinicItemsPost;
-            ':id': {
-              'add': {
-                '$url': {
-                };
-                '$post': ApiV1InventoryClinicItemsIdAddPost;
-              };
-              'withdraw': {
-                '$url': {
-                };
-                '$post': ApiV1InventoryClinicItemsIdWithdrawPost;
-              };
-            };
-            'more-utilized': {
-              '$url': {
-              };
-              '$post': ApiV1InventoryClinicItemsMoreutilizedPost;
-            };
-            'needing-replacement': {
-              '$url': {
-              };
-              '$get': ApiV1InventoryClinicItemsNeedingreplacementGetHead;
-              '$head': ApiV1InventoryClinicItemsNeedingreplacementGetHead;
-            };
-            '$get': ApiV1InventoryClinicItemsGetHead;
-            '$head': ApiV1InventoryClinicItemsGetHead;
-            'most-used': {
-              '$url': {
-              };
-              '$get': ApiV1InventoryClinicItemsMostusedGetHead;
-              '$head': ApiV1InventoryClinicItemsMostusedGetHead;
-            };
-            'categories': {
-              '$url': {
-              };
-              '$get': ApiV1InventoryClinicItemsCategoriesGetHead;
-              '$head': ApiV1InventoryClinicItemsCategoriesGetHead;
-            };
-          };
-          'inventory-value': {
-            '$url': {
-            };
-            '$get': ApiV1InventoryClinicInventoryvalueGetHead;
-            '$head': ApiV1InventoryClinicInventoryvalueGetHead;
-          };
-          'inventory-quantity': {
-            '$url': {
-            };
-            '$get': ApiV1InventoryClinicInventoryquantityGetHead;
-            '$head': ApiV1InventoryClinicInventoryquantityGetHead;
-          };
-        };
-      };
-      'purchase-requests': {
-        'clinic': {
+    'inventory': {
+      'clinic': {
+        'items': {
           '$url': {
           };
-          '$get': ApiV1PurchaserequestsClinicGetHead;
-          '$head': ApiV1PurchaserequestsClinicGetHead;
-          '$post': ApiV1PurchaserequestsClinicPost;
-        };
-        ':purchaseRequestId': {
-          'clinic': {
-            'received': {
+          '$post': V1InventoryClinicItemsPost;
+          ':id': {
+            'add': {
               '$url': {
               };
-              '$post': ApiV1PurchaserequestsIdClinicReceivedPost;
+              '$post': V1InventoryClinicItemsIdAddPost;
             };
-            'upload-invoice': {
+            'withdraw': {
               '$url': {
               };
-              '$post': ApiV1PurchaserequestsIdClinicUploadinvoicePost;
+              '$post': V1InventoryClinicItemsIdWithdrawPost;
             };
+          };
+          'more-utilized': {
             '$url': {
             };
-            '$delete': ApiV1PurchaserequestsIdClinicDelete;
-            'invoice-signed-url': {
-              '$url': {
-              };
-              '$get': ApiV1PurchaserequestsIdClinicInvoicesignedurlGetHead;
-              '$head': ApiV1PurchaserequestsIdClinicInvoicesignedurlGetHead;
+            '$post': V1InventoryClinicItemsMoreutilizedPost;
+          };
+          'needing-replacement': {
+            '$url': {
             };
+            '$get': V1InventoryClinicItemsNeedingreplacementGetHead;
+            '$head': V1InventoryClinicItemsNeedingreplacementGetHead;
+          };
+          '$get': V1InventoryClinicItemsGetHead;
+          '$head': V1InventoryClinicItemsGetHead;
+          'most-used': {
+            '$url': {
+            };
+            '$get': V1InventoryClinicItemsMostusedGetHead;
+            '$head': V1InventoryClinicItemsMostusedGetHead;
+          };
+          'categories': {
+            '$url': {
+            };
+            '$get': V1InventoryClinicItemsCategoriesGetHead;
+            '$head': V1InventoryClinicItemsCategoriesGetHead;
           };
         };
-      };
-      'item-suppliers': {
-        'clinic': {
+        'inventory-value': {
           '$url': {
           };
-          '$get': ApiV1ItemsuppliersClinicGetHead;
-          '$head': ApiV1ItemsuppliersClinicGetHead;
+          '$get': V1InventoryClinicInventoryvalueGetHead;
+          '$head': V1InventoryClinicInventoryvalueGetHead;
+        };
+        'inventory-quantity': {
+          '$url': {
+          };
+          '$get': V1InventoryClinicInventoryquantityGetHead;
+          '$head': V1InventoryClinicInventoryquantityGetHead;
         };
       };
     };
+    'purchase-requests': {
+      'clinic': {
+        '$url': {
+        };
+        '$get': V1PurchaserequestsClinicGetHead;
+        '$head': V1PurchaserequestsClinicGetHead;
+        '$post': V1PurchaserequestsClinicPost;
+      };
+      ':purchaseRequestId': {
+        'clinic': {
+          'received': {
+            '$url': {
+            };
+            '$post': V1PurchaserequestsIdClinicReceivedPost;
+          };
+          'upload-invoice': {
+            '$url': {
+            };
+            '$post': V1PurchaserequestsIdClinicUploadinvoicePost;
+          };
+          '$url': {
+          };
+          '$delete': V1PurchaserequestsIdClinicDelete;
+          'invoice-signed-url': {
+            '$url': {
+            };
+            '$get': V1PurchaserequestsIdClinicInvoicesignedurlGetHead;
+            '$head': V1PurchaserequestsIdClinicInvoicesignedurlGetHead;
+          };
+        };
+      };
+    };
+    'item-suppliers': {
+      'clinic': {
+        '$url': {
+        };
+        '$get': V1ItemsuppliersClinicGetHead;
+        '$head': V1ItemsuppliersClinicGetHead;
+      };
+    };
+  };
+  'api': {
     'login': {
       '$url': {
       };
@@ -284,35 +282,35 @@ export interface ApiDefinition {
 const routes = [
   {
     params: [],
-    name: 'v1.getContracts',
+    name: 'api.v1.contracts.getContracts',
     path: '/v1/contracts',
     method: ["GET","HEAD"],
     types: {} as V1ContractsGetHead,
   },
   {
     params: [],
-    name: 'v1.createContract',
+    name: 'api.v1.contracts.createContract',
     path: '/v1/contracts',
     method: ["POST"],
     types: {} as V1ContractsPost,
   },
   {
     params: [],
-    name: 'v1.getContractsCreatedInLast12Months',
+    name: 'api.v1.contracts.getContractsCreatedInLast12Months',
     path: '/v1/contracts/created-in-last-12-months',
     method: ["GET","HEAD"],
     types: {} as V1ContractsCreatedinlast12monthsGetHead,
   },
   {
     params: [],
-    name: 'v1.getContractsQuantityEndingIn30Days',
+    name: 'api.v1.contracts.getContractsQuantityEndingIn30Days',
     path: '/v1/contracts/ending-in-30-days/count',
     method: ["GET","HEAD"],
     types: {} as V1ContractsEndingin30daysCountGetHead,
   },
   {
     params: [],
-    name: 'v1.getActiveContractsQuantity',
+    name: 'api.v1.contracts.getActiveContractsQuantity',
     path: '/v1/contracts/active/count',
     method: ["GET","HEAD"],
     types: {} as V1ContractsActiveCountGetHead,
@@ -320,121 +318,121 @@ const routes = [
   {
     params: [],
     name: 'api.v1.inventory.createItem',
-    path: '/api/v1/inventory/clinic/items',
+    path: '/v1/inventory/clinic/items',
     method: ["POST"],
-    types: {} as ApiV1InventoryClinicItemsPost,
+    types: {} as V1InventoryClinicItemsPost,
   },
   {
     params: ["id"],
     name: 'api.v1.inventory.increaseItemQuantity',
-    path: '/api/v1/inventory/clinic/items/:id/add',
+    path: '/v1/inventory/clinic/items/:id/add',
     method: ["POST"],
-    types: {} as ApiV1InventoryClinicItemsIdAddPost,
+    types: {} as V1InventoryClinicItemsIdAddPost,
   },
   {
     params: ["id"],
     name: 'api.v1.inventory.decreaseItemQuantity',
-    path: '/api/v1/inventory/clinic/items/:id/withdraw',
+    path: '/v1/inventory/clinic/items/:id/withdraw',
     method: ["POST"],
-    types: {} as ApiV1InventoryClinicItemsIdWithdrawPost,
+    types: {} as V1InventoryClinicItemsIdWithdrawPost,
   },
   {
     params: [],
     name: 'api.v1.inventory.moreUtilizedItems',
-    path: '/api/v1/inventory/clinic/items/more-utilized',
+    path: '/v1/inventory/clinic/items/more-utilized',
     method: ["POST"],
-    types: {} as ApiV1InventoryClinicItemsMoreutilizedPost,
+    types: {} as V1InventoryClinicItemsMoreutilizedPost,
   },
   {
     params: [],
     name: 'api.v1.inventory.itemsNeedingReplacement',
-    path: '/api/v1/inventory/clinic/items/needing-replacement',
+    path: '/v1/inventory/clinic/items/needing-replacement',
     method: ["GET","HEAD"],
-    types: {} as ApiV1InventoryClinicItemsNeedingreplacementGetHead,
+    types: {} as V1InventoryClinicItemsNeedingreplacementGetHead,
   },
   {
     params: [],
     name: 'api.v1.inventory.inventoryValue',
-    path: '/api/v1/inventory/clinic/inventory-value',
+    path: '/v1/inventory/clinic/inventory-value',
     method: ["GET","HEAD"],
-    types: {} as ApiV1InventoryClinicInventoryvalueGetHead,
+    types: {} as V1InventoryClinicInventoryvalueGetHead,
   },
   {
     params: [],
     name: 'api.v1.inventory.inventoryQuantity',
-    path: '/api/v1/inventory/clinic/inventory-quantity',
+    path: '/v1/inventory/clinic/inventory-quantity',
     method: ["GET","HEAD"],
-    types: {} as ApiV1InventoryClinicInventoryquantityGetHead,
+    types: {} as V1InventoryClinicInventoryquantityGetHead,
   },
   {
     params: [],
     name: 'api.v1.inventory.getClinicItems',
-    path: '/api/v1/inventory/clinic/items',
+    path: '/v1/inventory/clinic/items',
     method: ["GET","HEAD"],
-    types: {} as ApiV1InventoryClinicItemsGetHead,
+    types: {} as V1InventoryClinicItemsGetHead,
   },
   {
     params: [],
     name: 'api.v1.inventory.getItemsWithMostTransactionsWithinLast12Months',
-    path: '/api/v1/inventory/clinic/items/most-used',
+    path: '/v1/inventory/clinic/items/most-used',
     method: ["GET","HEAD"],
-    types: {} as ApiV1InventoryClinicItemsMostusedGetHead,
+    types: {} as V1InventoryClinicItemsMostusedGetHead,
   },
   {
     params: [],
     name: 'api.v1.inventory.getCategories',
-    path: '/api/v1/inventory/clinic/items/categories',
+    path: '/v1/inventory/clinic/items/categories',
     method: ["GET","HEAD"],
-    types: {} as ApiV1InventoryClinicItemsCategoriesGetHead,
+    types: {} as V1InventoryClinicItemsCategoriesGetHead,
   },
   {
     params: [],
     name: 'api.v1.purchaseRequests.getClinicPurchaseRequests',
-    path: '/api/v1/purchase-requests/clinic',
+    path: '/v1/purchase-requests/clinic',
     method: ["GET","HEAD"],
-    types: {} as ApiV1PurchaserequestsClinicGetHead,
+    types: {} as V1PurchaserequestsClinicGetHead,
   },
   {
     params: [],
     name: 'api.v1.purchaseRequests.newPurchaseRequest',
-    path: '/api/v1/purchase-requests/clinic',
+    path: '/v1/purchase-requests/clinic',
     method: ["POST"],
-    types: {} as ApiV1PurchaserequestsClinicPost,
+    types: {} as V1PurchaserequestsClinicPost,
   },
   {
     params: ["purchaseRequestId"],
     name: 'api.v1.purchaseRequests.clinicReceivedPurchaseRequest',
-    path: '/api/v1/purchase-requests/:purchaseRequestId/clinic/received',
+    path: '/v1/purchase-requests/:purchaseRequestId/clinic/received',
     method: ["POST"],
-    types: {} as ApiV1PurchaserequestsIdClinicReceivedPost,
+    types: {} as V1PurchaserequestsIdClinicReceivedPost,
   },
   {
     params: ["purchaseRequestId"],
     name: 'api.v1.purchaseRequests.clinicUploadInvoice',
-    path: '/api/v1/purchase-requests/:purchaseRequestId/clinic/upload-invoice',
+    path: '/v1/purchase-requests/:purchaseRequestId/clinic/upload-invoice',
     method: ["POST"],
-    types: {} as ApiV1PurchaserequestsIdClinicUploadinvoicePost,
+    types: {} as V1PurchaserequestsIdClinicUploadinvoicePost,
   },
   {
     params: ["purchaseRequestId"],
     name: 'api.v1.purchaseRequests.clinicDeletePurchaseRequest',
-    path: '/api/v1/purchase-requests/:purchaseRequestId/clinic',
+    path: '/v1/purchase-requests/:purchaseRequestId/clinic',
     method: ["DELETE"],
-    types: {} as ApiV1PurchaserequestsIdClinicDelete,
+    types: {} as V1PurchaserequestsIdClinicDelete,
   },
   {
     params: ["purchaseRequestId"],
     name: 'api.v1.purchaseRequests.getInvoiceSignedUrl',
-    path: '/api/v1/purchase-requests/:purchaseRequestId/clinic/invoice-signed-url',
+    path: '/v1/purchase-requests/:purchaseRequestId/clinic/invoice-signed-url',
     method: ["GET","HEAD"],
-    types: {} as ApiV1PurchaserequestsIdClinicInvoicesignedurlGetHead,
+    types: {} as V1PurchaserequestsIdClinicInvoicesignedurlGetHead,
   },
   {
     params: [],
     name: 'api.v1.itemSuppliers.getClinicSuppliers',
-    path: '/api/v1/item-suppliers/clinic',
+    path: '/v1/item-suppliers/clinic',
     method: ["GET","HEAD"],
-    types: {} as ApiV1ItemsuppliersClinicGetHead,
+    types: {} as V1ItemsuppliersClinicGetHead,
   },
   {
     params: [],

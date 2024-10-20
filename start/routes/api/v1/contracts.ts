@@ -19,4 +19,4 @@ router
   })
   .prefix('/v1/contracts')
   .use(middleware.auth())
-  .as('v1')
+  .as('api.v1.contracts')

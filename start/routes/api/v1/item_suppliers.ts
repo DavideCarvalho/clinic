@@ -9,4 +9,4 @@ router
   })
   .prefix('/v1/item-suppliers')
   .use(middleware.auth())
-  .as('v1.itemSuppliers')
+  .as('api.v1.itemSuppliers')
