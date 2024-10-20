@@ -8,13 +8,11 @@
 */
 
 import router from '@adonisjs/core/services/router'
-import { middleware } from './kernel.js'
-import AutoSwagger from 'adonis-autoswagger'
-import swagger from '#config/swagger'
 import transmit from '@adonisjs/transmit/services/main'
-import { throttle } from './limiter.js'
 import mail from '@adonisjs/mail/services/main'
 import SendEmail from '#jobs/send_email'
+import { middleware } from './kernel.js'
+import { throttle } from './limiter.js'
 
 mail.setMessenger((mailer) => {
   return {
