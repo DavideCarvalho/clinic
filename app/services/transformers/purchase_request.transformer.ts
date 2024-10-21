@@ -24,6 +24,7 @@ export class PurchaseRequestTransformer {
       receivedAt: purchaseRequest.receivedAt?.toISO() ?? null,
       clinic: this.clinicTransformer.toJSON(purchaseRequest.clinic),
       itemSupplier: this.itemSupplierTransformer.toJSON(purchaseRequest.itemSupplier),
+      // TODO: async await
       purchaseRequestItems: purchaseRequest.purchaseRequestItems.map((item) =>
         this.purchaseRequestItemTransformer.toJSON(item)
       ),

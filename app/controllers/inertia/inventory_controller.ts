@@ -11,13 +11,24 @@ export default class InventoryController {
     return ctx.inertia.render<InventoryControllerResponse>('inventario/itens', {
       items: async () => {
         const items = await Item.getClinicItems(user!.clinicId)
-        return items.map((item) => {
-          return {
-            ...this.itemTransformer.toJSON(item),
-            quantity: item.quantity,
-            inventoryValue: item.inventoryValue,
-          }
-        })
+        const itemsWithQuantityAndInventoryValue = await Promise.all(
+          items.map(async (item) => {
+            const foundItem = await Item.query()
+              .where('id', item.id)
+              .preload('itemCategory')
+              .preload('createdBy')
+              .preload('updatedBy')
+              .preload('purchaseRequestItems')
+              .firstOrFail()
+
+            return {
+              ...this.itemTransformer.toJSON(foundItem),
+              quantity: Number(item.quantity),
+              inventoryValue: Number(item.inventoryValue),
+            }
+          }) as Promise<ItemDTO & { quantity: number; inventoryValue: number }>[]
+        )
+        return itemsWithQuantityAndInventoryValue
       },
     })
   }

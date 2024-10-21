@@ -3,6 +3,7 @@ import Item from '#models/item'
 import { ItemDTO } from '#controllers/dto/item.dto'
 import { ItemCategoryTransformer } from './item_category.transformer.js'
 import { UserTransformer } from './user.transformer.js'
+import ItemCategory from '#models/item_category'
 
 @inject()
 export class ItemTransformer {
@@ -11,14 +12,17 @@ export class ItemTransformer {
     private readonly userTransformer: UserTransformer
   ) {}
 
-  public toJSON(item: Item): ItemDTO {
+  public async toJSON(item: Item): Promise<ItemDTO> {
+    const itemCategory = item.itemCategory
+      ? item.itemCategory
+      : await ItemCategory.findOrFail(item.itemCategoryId)
     return {
       id: item.id,
       name: item.name,
       quantity: item.quantity,
       minimumQuantity: item.minimumQuantity,
       itemCategoryId: item.itemCategoryId,
-      itemCategory: this.itemCategoryTransformer.toJSON(item.itemCategory),
+      itemCategory: this.itemCategoryTransformer.toJSON(itemCategory),
       createdById: item.createdById,
       updatedById: item.updatedById,
       createdAt: item.createdAt.toISO()!,
