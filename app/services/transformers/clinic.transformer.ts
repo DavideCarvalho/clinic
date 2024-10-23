@@ -12,6 +12,7 @@ export class ClinicTransformer {
       id: clinic.id,
       name: clinic.name,
       email: clinic.email,
+      clinicChainId: clinic.clinicChainId,
       clinicChain: this.clinicChainTransformer.toJSON(clinic.clinicChain),
       createdAt: clinic.createdAt.toISO()!,
       updatedAt: clinic.updatedAt.toISO()!,

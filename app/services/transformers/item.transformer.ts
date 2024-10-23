@@ -4,6 +4,7 @@ import { ItemDTO } from '#controllers/dto/item.dto'
 import { ItemCategoryTransformer } from './item_category.transformer.js'
 import { UserTransformer } from './user.transformer.js'
 import ItemCategory from '#models/item_category'
+import User from '#models/user'
 
 @inject()
 export class ItemTransformer {
@@ -16,6 +17,8 @@ export class ItemTransformer {
     const itemCategory = item.itemCategory
       ? item.itemCategory
       : await ItemCategory.findOrFail(item.itemCategoryId)
+    const createdBy = item.createdBy ? item.createdBy : await User.findOrFail(item.createdById)
+    const updatedBy = item.updatedBy ? item.updatedBy : await User.findOrFail(item.updatedById)
     return {
       id: item.id,
       name: item.name,
@@ -27,8 +30,8 @@ export class ItemTransformer {
       updatedById: item.updatedById,
       createdAt: item.createdAt.toISO()!,
       updatedAt: item.updatedAt.toISO()!,
-      createdBy: this.userTransformer.toJSON(item.createdBy),
-      updatedBy: this.userTransformer.toJSON(item.updatedBy),
+      createdBy: this.userTransformer.toJSON(createdBy),
+      updatedBy: this.userTransformer.toJSON(updatedBy),
     }
   }
 }

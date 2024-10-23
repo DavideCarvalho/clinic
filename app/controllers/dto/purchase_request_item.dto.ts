@@ -9,7 +9,7 @@ export class PurchaseRequestItemDTO {
   declare status: string
   declare purchaseRequestId: string
   declare itemId: string
-  declare item?: ItemDTO
+  declare item: ItemDTO
   declare purchaseRequest: PurchaseRequestDTO
   declare createdAt: string
   declare updatedAt: string

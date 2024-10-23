@@ -31,6 +31,10 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { tuyau } from '~/api/tuyau-client'
+import { use, useEffect, useRef, useState } from 'react'
+import { ItemDTO } from '#controllers/dto/item.dto'
+import { ItemSupplierDTO } from '#controllers/dto/item_supplier.dto'
 
 const schema = z.object({
   fornecedor: z.string().min(1, 'Selecione um fornecedor'),
@@ -57,16 +61,28 @@ export function NewPurchaseRequestModal({
   onClose,
   onSubmit,
 }: NewPurchaseRequestModalProps) {
-  const items = []
-  const suppliers = []
-  // const { data: items } = useQuery({
-  //   queryKey: ['inventory', 'items'],
-  //   queryFn: () => getClinicItems(),
-  // })
-  // const { data: suppliers } = useQuery({
-  //   queryKey: ['item-suppliers', 'clinic'],
-  //   queryFn: () => getClinicSuppliers(),
-  // })
+  const [items, setItems] = useState<ItemDTO[]>([])
+  const [suppliers, setSuppliers] = useState<ItemSupplierDTO[]>([])
+  // const { data: items2 } = use(tuyau.$route('api.v1.inventory.getClinicItems', {}).$get())
+  useEffect(() => {
+    async function getClinicItems() {
+      const { data, error } = await tuyau.$route('api.v1.inventory.getClinicItems', {}).$get()
+      if (error) return
+      setItems(data)
+    }
+    getClinicItems()
+  })
+
+  useEffect(() => {
+    async function getClinicSuppliers() {
+      const { data, error } = await tuyau
+        .$route('api.v1.itemSuppliers.getClinicSuppliers', {})
+        .$get()
+      if (error) return
+      setSuppliers(data as any)
+    }
+    getClinicSuppliers()
+  })
 
   const form = useForm<NewPurchaseRequestFormValues>({
     resolver: zodResolver(schema),

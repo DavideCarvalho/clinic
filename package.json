@@ -44,8 +44,8 @@
     "@swc/core": "1.7.36",
     "@types/luxon": "3.4.2",
     "@types/node": "22.7.7",
-    "@types/react": "18.3.11",
-    "@types/react-dom": "18.3.1",
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc",
     "@types/uuid": "10.0.0",
     "@vitejs/plugin-react": "4.3.3",
     "autoprefixer": "10.4.20",
@@ -130,9 +130,9 @@
     "mjml": "4.15.3",
     "mysql2": "3.11.3",
     "next-themes": "0.3.0",
-    "react": "18.3.1",
+    "react": "19.0.0-rc-28668d39-20241023",
     "react-day-picker": "9.1.4",
-    "react-dom": "18.3.1",
+    "react-dom": "19.0.0-rc-28668d39-20241023",
     "react-hook-form": "7.53.1",
     "react-resizable-panels": "2.1.4",
     "recharts": "2.13.0",
@@ -152,5 +152,9 @@
       "./app/middleware/*.ts"
     ]
   },
-  "prettier": "@adonisjs/prettier-config"
+  "prettier": "@adonisjs/prettier-config",
+  "overrides": {
+    "@types/react": "npm:types-react@rc",
+    "@types/react-dom": "npm:types-react-dom@rc"
+  }
 }

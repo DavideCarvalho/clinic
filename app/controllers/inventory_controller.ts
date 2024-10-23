@@ -9,9 +9,12 @@ import { InventoryValueResponse } from './dto/inventory_value.response.js'
 import { InventoryQuantityResponse } from './dto/inventory_quantity.response.js'
 import { GetItemsWithMostTransactionsWithinLast12MonthsResponse } from './dto/get_items_with_most_transactions_within_last_12_months.response.js'
 import ItemCategory from '#models/item_category'
+import { ItemTransformer } from '#services/transformers/item.transformer'
 
 @inject()
 export default class ItemsController {
+  constructor(private readonly itemTransformer: ItemTransformer) {}
+
   /**
    *
    * @createItem
@@ -147,9 +150,10 @@ export default class ItemsController {
    *
    * @responseBody 200 - [{"id": number, "name": string, "quantity": number, "clinicId": string, "minimumQuantity": number, "itemCategoryId": string, "createdById": number, "updatedById": number, "createdAt": string, "updatedAt": string}]
    */
-  async getClinicItems({ auth }: HttpContext) {
+  public async getClinicItems({ auth }: HttpContext) {
     const userClinic = auth.user!.clinic
-    return Item.getClinicItems(userClinic.id)
+    const items = await Item.getClinicItems(userClinic.id)
+    return await Promise.all(items.map((item) => this.itemTransformer.toJSON(item)))
   }
 
   /**

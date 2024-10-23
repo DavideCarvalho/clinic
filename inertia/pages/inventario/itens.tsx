@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef } from 'react'
 import {
   Table,
   TableBody,
@@ -30,7 +30,6 @@ type ItemsPageProps = Propsify<InventoryControllerResponse>
 export default function ItemsPage({ items }: ItemsPageProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
-  const [data, setData] = useState<GetClinicItemsResponse>(items)
   const [sortConfig, setSortConfig] = useState<{
     key: keyof GetClinicItemsResponse[0]
     direction: 'asc' | 'desc'
@@ -47,7 +46,7 @@ export default function ItemsPage({ items }: ItemsPageProps) {
 
   // Aplicar ordenação e filtro aos dados
   const sortedAndFilteredItems = useMemo(() => {
-    let sortableItems = structuredClone(data)
+    let sortableItems = structuredClone(items)
     if (searchTerm) {
       sortableItems = sortableItems.filter((item) =>
         item.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -65,7 +64,7 @@ export default function ItemsPage({ items }: ItemsPageProps) {
       })
     }
     return sortableItems
-  }, [data, sortConfig, searchTerm])
+  }, [items, sortConfig, searchTerm])
 
   const pageCount = Math.ceil(sortedAndFilteredItems.length / itemsPerPage)
   const paginatedItems = sortedAndFilteredItems.slice(
@@ -126,12 +125,6 @@ export default function ItemsPage({ items }: ItemsPageProps) {
             <TableHead>
               <Button variant="ghost" onClick={() => sortItems('name')}>
                 Valor de inventário
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </TableHead>
-            <TableHead>
-              <Button variant="ghost" onClick={() => sortItems('name')}>
-                Ações
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>

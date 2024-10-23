@@ -26,6 +26,7 @@ import { UploadInvoicePurchaseRequestModal } from '~/components/purchase-request
 import { ConfirmDeletionModal } from '~/components/common/confirm-deletion-modal'
 import { router } from '@inertiajs/react'
 import { tuyau } from '~/api/tuyau-client'
+import { fileToBase64 } from '~/lib/file-to-base64'
 
 export default function OrdemsDeCompraPage({ purchaseRequests }) {
   const [isArrivalModalOpen, setIsArrivalModallOpen] = useState(false)
@@ -36,33 +37,16 @@ export default function OrdemsDeCompraPage({ purchaseRequests }) {
     GetClinicPurchaseRequestsResponse[0] | null
   >(null)
 
-  // const newPurchaseRequestMutation = useMutation({
-  //   mutationFn: newPurchaseRequest,
-  // })
-
-  // const clinicUploadInvoiceMutation = useMutation({
-  //   mutationFn: clinicUploadInvoice,
-  // })
-
-  // const clinicDeletePurchaseRequestMutation = useMutation({
-  //   mutationFn: clinicDeletePurchaseRequest,
-  // })
-
-  // const clinicReceivedPurchaseRequestMutation = useMutation({
-  //   mutationFn: clinicReceivedPurchaseRequest,
-  // })
-
   async function handleNewPurchaseRequest(data: NewPurchaseRequestFormValues) {
     const toastId = toast.loading('Criando solicitação de compra...')
     try {
-      // tuyau.api.v1.
-      // await newPurchaseRequestMutation.mutateAsync({
-      //   supplier: data.fornecedor,
-      //   items: data.itens.map((item) => ({
-      //     id: item.id,
-      //     quantidade: item.quantidade,
-      //   })),
-      // })
+      tuyau.$route('api.v1.purchaseRequests.newPurchaseRequest').$post({
+        supplier: data.fornecedor,
+        items: data.itens.map((item) => ({
+          id: item.id,
+          quantidade: item.quantidade,
+        })),
+      })
       toast.dismiss(toastId)
       toast.success('Solicitação de compra criada com sucesso!')
     } catch (e) {
@@ -174,16 +158,18 @@ export default function OrdemsDeCompraPage({ purchaseRequests }) {
     if (selectedPurchaseRequest.status !== 'WAITING_ARRIVAL') return
     const toastId = toast.loading('Registrando chegada...')
     try {
-      // await clinicReceivedPurchaseRequestMutation.mutateAsync({
-      //   purchaseRequestId: selectedPurchaseRequest.id,
-      //   arrivalDate: data.arrivalDate,
-      //   invoice: data.invoice,
-      //   items: data.items.map((item) => ({
-      //     itemId: item.itemId,
-      //     askedQuantity: item.askedQuantity,
-      //     receivedQuantity: item.receivedQuantity,
-      //   })),
-      // })
+      await tuyau.$route('api.v1.purchaseRequests.clinicReceivedPurchaseRequest').$post({
+        params: {
+          purchaseRequestId: selectedPurchaseRequest.id,
+        },
+        arrivalDate: data.arrivalDate.toISOString(),
+        invoice: data.invoice ? await fileToBase64(data.invoice) : undefined,
+        items: data.items.map((item) => ({
+          itemId: item.itemId,
+          askedQuantity: item.askedQuantity,
+          receivedQuantity: item.receivedQuantity,
+        })),
+      })
       toast.dismiss(toastId)
       toast.success('Chegada registrada com sucesso!')
     } catch (e) {
@@ -212,9 +198,11 @@ export default function OrdemsDeCompraPage({ purchaseRequests }) {
     if (!selectedPurchaseRequest) return
     const toastId = toast.loading('Deletando solicitação de compra...')
     try {
-      // await clinicDeletePurchaseRequestMutation.mutateAsync({
-      //   purchaseRequestId: selectedPurchaseRequest.id,
-      // })
+      await tuyau.$route('api.v1.purchaseRequests.clinicDeletePurchaseRequest').$delete({
+        params: {
+          purchaseRequestId: selectedPurchaseRequest.id,
+        },
+      })
       toast.dismiss(toastId)
       toast.success('Solicitação de compra deletada com sucesso!')
       setSelectedPurchaseRequest(null)
@@ -231,12 +219,12 @@ export default function OrdemsDeCompraPage({ purchaseRequests }) {
     if (!selectedPurchaseRequest) return
     const toastId = toast.loading('Enviando nota fiscal...')
     try {
-      // await clinicUploadInvoiceMutation.mutateAsync({
-      //   purchaseRequestId: selectedPurchaseRequest.id,
-      //   body: {
-      //     invoice,
-      //   },
-      // })
+      await tuyau.$route('api.v1.purchaseRequests.clinicUploadInvoice').$post({
+        params: {
+          purchaseRequestId: selectedPurchaseRequest.id,
+        },
+        invoice: await fileToBase64(invoice),
+      })
       toast.dismiss(toastId)
       toast.success('Nota fiscal enviada com sucesso!')
       setIsUploadInvoiceModalOpen(false)

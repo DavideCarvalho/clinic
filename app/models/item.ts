@@ -67,23 +67,20 @@ export default class Item extends BaseUUIDModel {
 
     const itemsWithQuantityAndInventoryValue = await Promise.all(
       response.map(async (item) => {
-        const foundItem = await this.query()
-          .where('id', item.id)
-          .preload('itemCategory')
-          .preload('createdBy')
-          .preload('updatedBy')
-          .preload('purchaseRequestItems')
-          .firstOrFail()
+        const foundItem = await this.query().where('id', item.id).firstOrFail()
 
-        return {
-          ...foundItem.toJSON(),
-          quantity: Number(item.quantity),
-          inventoryValue: Number(item.inventory_value),
-        } as Item & { quantity: number; inventoryValue: number }
+        foundItem.quantity = Number(item.quantity)
+        // @ts-expect-error
+        foundItem.inventoryValue = Number(item.inventory_value)
+
+        return foundItem
       })
     )
 
-    return itemsWithQuantityAndInventoryValue
+    return itemsWithQuantityAndInventoryValue as unknown as (Item & {
+      quantity: number
+      inventoryValue: number
+    })[]
   }
 
   public static async itemsNeedingReplacement(

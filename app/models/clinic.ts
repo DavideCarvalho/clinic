@@ -12,6 +12,9 @@ export default class Clinic extends BaseUUIDModel {
   @column()
   declare email: string
 
+  @column()
+  declare clinicChainId: string
+
   @belongsTo(() => ClinicChain)
   declare clinicChain: BelongsTo<typeof ClinicChain>
 

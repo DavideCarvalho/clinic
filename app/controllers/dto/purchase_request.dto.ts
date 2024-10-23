@@ -1,6 +1,5 @@
 import { ClinicDTO } from './clinic.dto.js'
 import { ItemSupplierDTO } from './item_supplier.dto.js'
-import { PurchaseRequestItemDTO } from './purchase_request_item.dto.js'
 
 export class PurchaseRequestDTO {
   declare id: string
@@ -10,11 +9,10 @@ export class PurchaseRequestDTO {
   declare itemSupplierId: string
   declare invoiceFilePath: string | null
   declare receivedAt: string | null
-  declare clinic: ClinicDTO
-  declare itemSupplier: ItemSupplierDTO
-  declare purchaseRequestItems?: PurchaseRequestItemDTO[]
   declare createdAt: string
   declare updatedAt: string
+  declare clinic: ClinicDTO
+  declare itemSupplier: ItemSupplierDTO
 }
 
 export type PurchaseRequestDTOStatus =

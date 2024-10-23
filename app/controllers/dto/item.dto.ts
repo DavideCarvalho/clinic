@@ -1,4 +1,5 @@
 import { ItemCategoryDTO } from './item_category.dto.js'
+import { PurchaseRequestItemDTO } from './purchase_request_item.dto.js'
 import { UserDTO } from './user.dto.js'
 
 export class ItemDTO {

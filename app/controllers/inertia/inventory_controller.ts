@@ -1,8 +1,10 @@
 import { ItemDTO } from '#controllers/dto/item.dto'
 import Item from '#models/item'
 import { ItemTransformer } from '#services/transformers/item.transformer'
+import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 
+@inject()
 export default class InventoryController {
   constructor(private readonly itemTransformer: ItemTransformer) {}
 
@@ -13,16 +15,11 @@ export default class InventoryController {
         const items = await Item.getClinicItems(user!.clinicId)
         const itemsWithQuantityAndInventoryValue = await Promise.all(
           items.map(async (item) => {
-            const foundItem = await Item.query()
-              .where('id', item.id)
-              .preload('itemCategory')
-              .preload('createdBy')
-              .preload('updatedBy')
-              .preload('purchaseRequestItems')
-              .firstOrFail()
+            const foundItem = await Item.query().where('id', item.id).firstOrFail()
+            const transformedItem = await this.itemTransformer.toJSON(foundItem)
 
             return {
-              ...this.itemTransformer.toJSON(foundItem),
+              ...transformedItem,
               quantity: Number(item.quantity),
               inventoryValue: Number(item.inventoryValue),
             }
@@ -34,6 +31,8 @@ export default class InventoryController {
   }
 }
 
+type ItemDTOWithQuantityAndInventoryValue = ItemDTO & { quantity: number; inventoryValue: number }
+
 export interface InventoryControllerResponse {
-  items: () => Promise<(ItemDTO & { quantity: number; inventoryValue: number })[]>
+  items: () => Promise<ItemDTOWithQuantityAndInventoryValue[]>
 }
